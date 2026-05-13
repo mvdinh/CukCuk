@@ -1,0 +1,161 @@
+const candidateFields = [
+  {
+    field: "candidateName",
+    label: "Họ và tên",
+    type: "text",
+    required: true,
+    placeholder: "Nhập họ và tên",
+    fullWidth: true,
+  },
+  {
+    field: "dateOfBirth",
+    label: "Ngày sinh",
+    type: "date",
+    mode: "date",
+    select: true,
+    placeholder: "dd/MM/yyyy",
+    halfWidth: true,
+  },
+  {
+    field: "gender",
+    label: "Giới tính",
+    type: "select",
+    required: true,
+    options: "genderOptions",
+    placeholder: "Chọn giới tính",
+    halfWidth: true,
+  },
+  {
+    field: "phoneNumber",
+    label: "Số điện thoại",
+    type: "text",
+    required: true,
+    placeholder: "Nhập số điện thoại",
+    halfWidth: true,
+  },
+  {
+    field: "email",
+    label: "Email",
+    type: "text",
+    required: true,
+    placeholder: "Nhập Email",
+    halfWidth: true,
+  },
+  {
+    field: "nation",
+    label: "Quốc gia",
+    type: "select",
+    options: "nationOptions",
+    placeholder: "Chọn quốc gia",
+    fullWidth: true,
+  },
+  {
+    field: "city",
+    label: "Tỉnh / Thành phố",
+    type: "select",
+    options: "cityOptions",
+    placeholder: "Chọn tỉnh / thành phố",
+    fullWidth: true,
+  },
+  {
+    field: "district",
+    label: "Phường / Xã",
+    type: "select",
+    options: "districtOptions",
+    placeholder: "Chọn phường / xã",
+    fullWidth: true,
+  },
+  {
+    field: "address",
+    label: "Địa chỉ",
+    type: "text",
+    placeholder: "Nhập địa chỉ chi tiết",
+    fullWidth: true,
+  },
+
+  { type: "section", label: "Học vấn" },
+  {
+    field: "educationLevel",
+    label: "Trình độ đào tạo",
+    type: "select-add",
+    options: "educationLevelOptions",
+    fullWidth: true,
+  },
+  {
+    field: "educationPlace",
+    label: "Nơi đào tạo",
+    type: "select-add",
+    options: "educationOptions",
+    fullWidth: true,
+  },
+
+  { type: "divider" },
+  {
+    field: "candidateSource",
+    label: "Nguồn ứng viên",
+    type: "select",
+    options: "sourceOptions",
+    fullWidth: true,
+  },
+
+  { type: "section", label: "Kinh nghiệm làm việc" },
+  {
+    field: "nearestWorkplace",
+    label: "Nơi làm việc gần đây",
+    type: "text",
+    fullWidth: true,
+  },
+  {
+    field: "workPosition",
+    label: "Vị trí công việc",
+    type: "text",
+    fullWidth: true,
+  },
+  {
+    field: "note",
+    label: "Mô tả công việc",
+    type: "textarea",
+    fullWidth: true,
+  },
+  {
+    field: "rating",
+    label: "Đánh giá",
+    type: "text",
+    placeholder: "Nhập đánh giá (1-10)",
+    fullWidth: true,
+  },
+];
+
+const options = {
+  genderOptions: [
+    { value: 1, label: "Nam" },
+    { value: 0, label: "Nữ" },
+  ],
+  nationOptions: [
+    { value: "Việt Nam", label: "Việt Nam" },
+    { value: "Nhật Bản", label: "Nhật Bản" },
+    { value: "Hàn Quốc", label: "Hàn Quốc" },
+  ],
+  // cityOptions: [],
+  // districtOptions: [],
+  educationOptions: [
+    { value: "Đại học Bách khoa Hà Nội", label: "Đại học Bách khoa Hà Nội" },
+    { value: "Đại học Kinh tế Quốc dân", label: "Đại học Kinh tế Quốc dân" },
+    { value: "Đại học FPT", label: "Đại học FPT" },
+  ],
+  educationLevelOptions: [
+    { value: "Đại học", label: "Đại học" },
+    { value: "Cao đẳng", label: "Cao đẳng" },
+    { value: "Trung cấp", label: "Trung cấp" },
+    { value: "Trung học", label: "Trung học" },
+  ],
+  sourceOptions: [
+    { value: "Website", label: "Website" },
+    { value: "Facebook", label: "Facebook" },
+    { value: "LinkedIn", label: "LinkedIn" },
+    { value: "Giới thiệu", label: "Giới thiệu" },
+    { value: "Tuyển dụng", label: "Tuyển dụng" },
+  ],
+};
+
+export { candidateFields, options };
