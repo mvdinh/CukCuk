@@ -10,6 +10,7 @@
           @search="handleSearchEnter"
           @filter="handleFilter"
           @reload="loadData"
+          @configColumns="showColumnConfig = true"
         />
 
         <div class="content__body__table">
@@ -22,10 +23,12 @@
           <div class="table-wrapper">
             <MsTable
               :rows="rows"
-              :fields="fieldMenu"
+              :fields="visibleFields"
               :hasCheckbox="false"
+              filterable
               @edit="handleEdit"
               @delete="handleDelete"
+              @filter="handleFilter"
             />
           </div>
         </div>
@@ -39,12 +42,18 @@
       </div>
     </div>
 
-    <!-- InventoryForm goes here in the future -->
+    <ColumnConfigDialog
+      v-model="showColumnConfig"
+      :columns="allFields"
+      @apply="handleApplyConfig"
+      @reset="handleResetConfig"
+    />
   </div>
 </template>
+ 
 
 <script>
-import { defineComponent, getCurrentInstance, watch, onMounted } from "vue";
+import { defineComponent, getCurrentInstance, watch, onMounted, ref, computed } from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
 
@@ -52,8 +61,9 @@ import MsTable from "../components/ms-table/MsTable.vue";
 import MsPagination from "../components/ms-pagination/MsPagination.vue";
 import ContentHeader from "../components/Content/ContentHeader.vue";
 import CandidateToolbar from "../components/Content/CandidateToolbar.vue";
+import ColumnConfigDialog from "./dialogs/ColumnConfigDialog.vue";
 import BaseList from "../base/BaseList";
-import fieldMenu from "../assets/data/fieldMenu.js";
+import fieldMenuData from "../assets/data/fieldMenu.js";
 import { toast } from "../utils/toast";
 import { confirmDialog } from "../utils/confirm";
 
@@ -86,7 +96,17 @@ export default defineComponent({
         proxy.loading = true;
 
         const filtersArray = [];
-        // Giữ logic filter cũ nếu cần, hoặc bỏ đi
+        if (proxy.filters) {
+          Object.keys(proxy.filters).forEach(key => {
+            if (proxy.filters[key]) {
+              filtersArray.push({
+                Field: key,
+                Value: proxy.filters[key],
+                Operator: "contains"
+              });
+            }
+          });
+        }
 
         const payload = {
           textSearch: proxy.searchText || "",
@@ -197,6 +217,21 @@ export default defineComponent({
       loadData();
     });
 
+    const allFields = ref([...fieldMenuData.map(f => ({ ...f, visible: true }))]);
+    const showColumnConfig = ref(false);
+
+    const visibleFields = computed(() => {
+      return allFields.value.filter(f => f.visible);
+    });
+
+    const handleApplyConfig = (newCols) => {
+      allFields.value = newCols;
+    };
+
+    const handleResetConfig = () => {
+      allFields.value = [...fieldMenuData.map(f => ({ ...f, visible: true }))];
+    };
+
     return {
       loadData,
       handlePagingChange,
@@ -207,7 +242,11 @@ export default defineComponent({
       handleAdd,
       handleEdit,
 
-      fieldMenu,
+      allFields,
+      visibleFields,
+      showColumnConfig,
+      handleApplyConfig,
+      handleResetConfig,
     };
   },
 

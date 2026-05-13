@@ -22,17 +22,23 @@
         class="ms-input__field"
         :class="{ 'input--error': showError }"
       />
+
+      <div v-if="showError" class="ms-input__icon-error" :title="errorMessages[0]">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+           <circle cx="12" cy="12" r="10" fill="#ff4d4f"/>
+           <path d="M12 7V13M12 17H12.01" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
     </div>
 
-    <ul v-if="!isSearch && showError" class="ms-input__error-list">
-      <li
-        v-for="(msg, index) in errorMessages"
-        :key="index"
-        class="ms-input__error-msg"
-      >
-        {{ msg }}
-      </li>
-    </ul>
+    <div v-if="!isSearch && showError" class="ms-input__error-tooltip">
+      <div class="tooltip-arrow"></div>
+      <div class="tooltip-content">
+        <span v-for="(msg, index) in errorMessages" :key="index">
+          {{ msg }}
+        </span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -108,6 +114,7 @@ const errorMessages = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  position: relative;
 
   &__label {
     font-size: 13px;
@@ -139,7 +146,50 @@ const errorMessages = computed(() => {
     }
     &.input--error {
       border-color: #ff4d4f;
+      padding-right: 36px;
     }
+  }
+
+  &__icon-error {
+    position: absolute;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    cursor: help;
+  }
+
+  &__error-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    pointer-events: none;
+
+    .tooltip-arrow {
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 8px solid #ff4d4f;
+      margin: 0 auto;
+    }
+
+    .tooltip-content {
+      background: #ff4d4f;
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+  }
+
+  &__counter {
+    font-size: 11px;
+    color: #888;
+    text-align: right;
   }
 
   &__error-list {

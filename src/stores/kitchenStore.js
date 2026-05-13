@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import httpClient from '../api/httpClient';
+import { defineStore } from "pinia";
+import httpClient from "../api/httpClient";
 
-export const useKitchenStore = defineStore('kitchen', {
+export const useKitchenStore = defineStore("kitchen", {
   state: () => ({
     kitchens: [],
     isLoading: false,
@@ -10,13 +10,13 @@ export const useKitchenStore = defineStore('kitchen', {
     async fetchKitchens() {
       this.isLoading = true;
       try {
-        const response = await httpClient.get('/kitchen');
-        this.kitchens = response.data || [];
+        const response = await httpClient.get("/kitchens");
+        this.kitchens = response.data.listData || [];
       } catch (error) {
         console.error(error);
       } finally {
         this.isLoading = false;
       }
-    }
-  }
+    },
+  },
 });

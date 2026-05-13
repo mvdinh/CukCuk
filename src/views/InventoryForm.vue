@@ -39,15 +39,11 @@
             <div class="image-section">
               <div class="image-box">
                 <div class="image-placeholder">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M4 16L8.586 11.414C8.96106 11.0391 9.46967 10.8284 10 10.8284C10.5303 10.8284 11.0389 11.0391 11.414 11.414L16 16M14 14L15.586 12.414C15.9611 12.0391 16.4697 11.8284 17 11.8284C17.5303 11.8284 18.0389 12.0391 18.414 12.414L20 14M14 8H14.01M6 20H18C18.5304 20 19.0391 19.7893 19.4142 19.4142C19.7893 19.0391 20 18.5304 20 18V6C20 5.46957 19.7893 4.96086 19.4142 4.58579C19.0391 4.21071 18.5304 4 18 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V18C4 18.5304 4.21071 19.0391 4.58579 19.4142C4.96086 19.7893 5.46957 20 6 20Z"
-                      stroke="#B0B0B0"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
+                  <img
+                    :src="icons.Image_placeholder"
+                    alt="image"
+                    class="image-icon"
+                  />
                 </div>
               </div>
               <div class="image-desc">Ảnh món</div>
@@ -201,30 +197,38 @@
             Ghi lại các sở thích của khách hàng giúp nhân viên phục vụ chọn
             nhanh order. VD: không cay/ ít hành/ thêm phomai...
           </div>
-          <!-- Simple mockup table for UI -->
+          <!-- Table with MsSelect and + button -->
           <table class="serving-table">
             <thead>
               <tr>
-                <th>Sở thích phục vụ</th>
+                <th style="width: 60%">Sở thích phục vụ</th>
                 <th>Thu thêm</th>
-                <th></th>
+                <th style="width: 50px"></th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td><input type="text" class="table-input" /></td>
+              <tr v-for="(pref, index) in item.servingPreferences" :key="index">
                 <td>
-                  <input
-                    type="text"
-                    class="table-input text-right"
-                    value="0,00"
-                  />
+                  <div class="flex-row">
+                    <MsSelect
+                      v-model="pref.preferenceID"
+                      :options="servingOptions"
+                      class="flex-1"
+                      @change="updateServingPrice(index, pref.preferenceID)"
+                    />
+                    <button class="btn-icon-add" @click="handleOpenServingDialog(index)">+</button>
+                  </div>
                 </td>
-                <td class="action-cell">🗑️</td>
+                <td>
+                  <MsInput type="number" v-model="pref.price" />
+                </td>
+                <td class="action-cell">
+                  <button class="btn-delete" @click="removeServingRow(index)">🗑️</button>
+                </td>
               </tr>
             </tbody>
           </table>
-          <button class="btn-add-row">+ Thêm dòng</button>
+          <button class="btn-add-row" @click="handleAddServingRow">+ Thêm dòng</button>
         </div>
       </div>
 
@@ -238,11 +242,16 @@
         </div>
       </div>
     </div>
+
+    <!-- DIALOGS -->
+    <CategoryDialog v-model="showCategoryDialog" @saved="onCategorySaved" />
+    <UnitDialog v-model="showUnitDialog" @saved="onUnitSaved" />
+    <ServingDialog v-model="showServingDialog" @saved="onServingSaved" />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch, nextTick } from "vue";
+import { ref, onMounted, computed, watch, nextTick, inject } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useInventoryItemStore } from "../stores/inventoryItemStore";
 import { useCategoryStore } from "../stores/categoryStore";
@@ -251,9 +260,14 @@ import { useKitchenStore } from "../stores/kitchenStore";
 import MsInput from "../components/ms-input/MsInput.vue";
 import MsSelect from "../components/ms-select/MsSelect.vue";
 import MsButton from "../components/ms-button/MsButton.vue";
+import CategoryDialog from "./dialogs/CategoryDialog.vue";
+import UnitDialog from "./dialogs/UnitDialog.vue";
+import ServingDialog from "./dialogs/ServingDialog.vue";
+import { useServingStore } from "../stores/servingStore";
 import { confirmDialog } from "../utils/confirm";
 import { toast } from "../utils/toast";
 
+const icons = inject("icons");
 const router = useRouter();
 const route = useRoute();
 
@@ -261,6 +275,7 @@ const inventoryStore = useInventoryItemStore();
 const categoryStore = useCategoryStore();
 const unitStore = useUnitStore();
 const kitchenStore = useKitchenStore();
+const servingStore = useServingStore();
 
 const isEdit = computed(() => !!route.params.id);
 
@@ -283,6 +298,7 @@ const item = ref({
   costPrice: 0,
   kitchenIDs: [],
   description: "",
+  servingPreferences: [],
 });
 
 const originalItemString = ref("");
@@ -322,11 +338,16 @@ const availableKitchens = computed(() => {
   );
 });
 
+const servingOptions = computed(() =>
+  servingStore.preferences.map((p) => ({ value: p.id, label: p.name })),
+);
+
 onMounted(async () => {
   await Promise.all([
     categoryStore.fetchCategories(),
     unitStore.fetchUnits(),
     kitchenStore.fetchKitchens(),
+    servingStore.fetchPreferences(),
   ]);
 
   if (isEdit.value) {
@@ -361,28 +382,59 @@ const removeKitchen = (id) => {
   item.value.kitchenIDs = item.value.kitchenIDs.filter((kId) => kId !== id);
 };
 
-const handleAddCategory = async () => {
-  const name = prompt("Nhập tên nhóm thực đơn mới:");
-  if (name) {
-    try {
-      const res = await categoryStore.addCategory(name);
-      toast.success("Thêm nhóm thực đơn thành công!");
-      // Auto select logic needs the response ID, mock for now
-    } catch (e) {
-      toast.error("Thêm nhóm thực đơn thất bại");
-    }
+const showCategoryDialog = ref(false);
+const showUnitDialog = ref(false);
+
+const handleAddCategory = () => {
+  showCategoryDialog.value = true;
+};
+
+const onCategorySaved = (name) => {
+  const newCat = categoryStore.categories.find(c => c.inventoryItemCategoryName === name);
+  if (newCat) {
+    item.value.inventoryItemCategoryID = newCat.inventoryItemCategoryID;
   }
 };
 
-const handleAddUnit = async () => {
-  const name = prompt("Nhập tên đơn vị tính mới:");
-  if (name) {
-    try {
-      const res = await unitStore.addUnit(name);
-      toast.success("Thêm đơn vị tính thành công!");
-    } catch (e) {
-      toast.error("Thêm đơn vị tính thất bại");
-    }
+const handleAddUnit = () => {
+  showUnitDialog.value = true;
+};
+
+const onUnitSaved = (name) => {
+  const newUnit = unitStore.units.find(u => u.unitName === name);
+  if (newUnit) {
+    item.value.unitID = newUnit.unitID;
+  }
+};
+
+const showServingDialog = ref(false);
+const currentServingIndex = ref(-1);
+
+const handleAddServingRow = () => {
+  item.value.servingPreferences.push({ preferenceID: "", price: 0 });
+};
+
+const removeServingRow = (index) => {
+  item.value.servingPreferences.splice(index, 1);
+};
+
+const handleOpenServingDialog = (index) => {
+  currentServingIndex.value = index;
+  showServingDialog.value = true;
+};
+
+const onServingSaved = (newPref) => {
+  servingStore.addPreference(newPref);
+  if (currentServingIndex.value > -1) {
+    item.value.servingPreferences[currentServingIndex.value].preferenceID = newPref.id;
+    item.value.servingPreferences[currentServingIndex.value].price = newPref.price;
+  }
+};
+
+const updateServingPrice = (index, prefID) => {
+  const pref = servingStore.preferences.find(p => p.id === prefID);
+  if (pref) {
+    item.value.servingPreferences[index].price = pref.price;
   }
 };
 

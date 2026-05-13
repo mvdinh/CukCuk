@@ -41,10 +41,32 @@
         </th>
 
         <th v-for="field in fields" :key="field.key" :style="field.type === 'avatar' ? 'min-width: 48px; width: 48px; padding-right: 0;' : ''">
-          {{ field.label }}
+          <div class="header-content">
+            {{ field.label }}
+            <div v-if="filterable" class="header-filter-icon" @click.stop="toggleFilter(field.key)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M3 6H21M6 12H18M10 18H14" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
         </th>
 
         <th class="col-action"></th>
+      </tr>
+      <tr v-if="filterable" class="filter-row">
+        <th v-if="hasCheckbox"></th>
+        <th v-for="field in fields" :key="'filter_' + field.key">
+          <div v-if="field.key" class="filter-input-wrapper">
+             <input 
+               type="text" 
+               class="filter-input" 
+               v-model="filters[field.key]" 
+               @input="handleFilterInput"
+               placeholder="*"
+             />
+          </div>
+        </th>
+        <th></th>
       </tr>
     </thead>
 
@@ -115,7 +137,7 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import MsButton from "../ms-button/MsButton.vue";
 
 const props = defineProps({
@@ -135,7 +157,22 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  filterable: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const filters = ref({});
+const filterVisible = ref({});
+
+const handleFilterInput = () => {
+  emit("filter", filters.value);
+};
+
+const toggleFilter = (key) => {
+  filterVisible.value[key] = !filterVisible.value[key];
+};
 
 const emit = defineEmits(["edit", "delete", "update:selected"]);
 
@@ -282,5 +319,44 @@ tr:hover td {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.header-filter-icon {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  &:hover {
+    background: #e0e0e0;
+  }
+}
+
+.filter-row {
+  th {
+    padding: 4px 8px;
+    background: #fff;
+    border-bottom: 1px solid var(--border-table);
+  }
+}
+
+.filter-input-wrapper {
+  .filter-input {
+    width: 100%;
+    height: 28px;
+    border: 1px solid #d0d0d0;
+    border-radius: 3px;
+    padding: 0 8px;
+    font-size: 12px;
+    outline: none;
+    &:focus {
+      border-color: #2680eb;
+    }
+  }
 }
 </style>

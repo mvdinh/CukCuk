@@ -10,8 +10,8 @@ export const useCategoryStore = defineStore('category', {
     async fetchCategories() {
       this.isLoading = true;
       try {
-        const response = await httpClient.get('/inventoryItemCategory');
-        this.categories = response.data || [];
+        const response = await httpClient.get('/categories');
+        this.categories = response.data.listData || [];
       } catch (error) {
         console.error(error);
       } finally {
@@ -20,7 +20,7 @@ export const useCategoryStore = defineStore('category', {
     },
     async addCategory(name) {
       const payload = { inventoryItemCategoryName: name, inventoryItemCategoryCode: `CAT-${Date.now()}` };
-      const res = await httpClient.post('/inventoryItemCategory', payload);
+      const res = await httpClient.post('/categories', payload);
       await this.fetchCategories();
       return res.data;
     }
