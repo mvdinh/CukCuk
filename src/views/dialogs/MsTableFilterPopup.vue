@@ -56,7 +56,7 @@
         <th
           v-if="hasCheckbox"
           class="col-checkbox col--pinned"
-          style="left: 0; z-index: 51"
+          style="left: 0; z-index: 31"
         >
           <input
             type="checkbox"
@@ -155,7 +155,7 @@
         <th
           v-if="hasCheckbox"
           class="col-checkbox col--pinned"
-          style="left: 0; z-index: 51"
+          style="left: 0; z-index: 31"
         ></th>
         <th
           v-for="field in fields"
@@ -393,37 +393,10 @@ onBeforeUnmount(() => {
 
 const hoveredKey = ref(null);
 const activeFilterKey = ref(null);
-const filters = reactive({}); // Missing local filters state for the filter-row
-
 const localFilter = reactive({
   operator: "contains",
   value: "",
 });
-
-// Initialize filters from store
-onMounted(() => {
-  props.fields.forEach((f) => {
-    if (f.key) {
-      filters[f.key] = filterStore.columnFilters[f.key]?.value || "";
-    }
-  });
-});
-
-// Sync local filters to store on input
-const handleFilterInput = () => {
-  Object.keys(filters).forEach((key) => {
-    if (filters[key]) {
-      filterStore.setFilter(key, {
-        operator: filterStore.columnFilters[key]?.operator || "contains",
-        value: filters[key],
-        active: true,
-      });
-    } else {
-      filterStore.removeFilter(key);
-    }
-  });
-  emit("filter", filterStore.columnFilters);
-};
 
 const isFilterActive = (key) => {
   return (
@@ -461,6 +434,8 @@ const clearLocalFilter = () => {
   activeFilterKey.value = null;
   emit("filter", filterStore.columnFilters);
 };
+
+const handleFilterInput = () => emit("filter", filterStore.columnFilters);
 
 // Đóng popup khi click ngoài
 const handleClickOutside = (e) => {
@@ -552,19 +527,15 @@ table {
 
 /* ── Header ── */
 th {
-  position: sticky;
-  top: 0;
-  z-index: 40; /* Higher than pinned columns which are 30 */
+  position: relative;
   text-align: left;
   height: 48px;
   padding: 8px 10px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
+  border-top: 1px solid var(--border-table);
+  border-right: 1px solid var(--border-table); /* Thêm viền phải để nhìn rõ cột */
   background-color: #f9fafb;
 }
 
@@ -613,10 +584,9 @@ td {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  border-top: 1px solid #e0e0e0;
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
+  border-top: 1px solid var(--border-table);
+  border-bottom: 1px solid var(--border-table);
+  border-right: 1px solid var(--border-table);
   background-color: white;
 }
 
@@ -628,7 +598,7 @@ td {
 }
 
 th.col--pinned {
-  z-index: 50; /* Cao hơn cả th sticky (40) */
+  z-index: 30; /* Header pinned cao hơn body pinned */
 }
 
 .col--last-pinned {

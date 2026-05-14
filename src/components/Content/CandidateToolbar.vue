@@ -50,14 +50,9 @@
       <MsButton type="custom" class="toolbar__icon" title="Cài đặt" @click="$emit('configColumns')">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       </MsButton>
-      <MsButton type="custom" class="toolbar__icon" title="Bộ lọc" @click="toggleFilter">
+      <MsButton type="custom" class="toolbar__icon" :class="{ 'filter--active': filterStore.showAdvancedFilter }" title="Bộ lọc" @click="filterStore.toggleAdvancedFilter()">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
       </MsButton>
-      <InventoryFilter 
-        v-model="showFilter"
-        :currentFilters="activeFilters"
-        @apply="handleApplyFilter"
-      />
     </div>
   </div>
 </template>
@@ -66,7 +61,9 @@
 import { computed, ref } from "vue";
 import MsInput from "../ms-input/MsInput.vue";
 import MsButton from "../ms-button/MsButton.vue";
-import InventoryFilter from "./InventoryFilter.vue";
+import { useFilterStore } from "../../stores/filterStore";
+
+const filterStore = useFilterStore();
 
 const props = defineProps({
   selectedIds: Array,
@@ -82,12 +79,7 @@ const emit = defineEmits([
   "configColumns"
 ]);
 
-const showFilter = ref(false);
-const activeFilters = ref({});
-
-const toggleFilter = () => {
-  showFilter.value = !showFilter.value;
-};
+// Remove local filter visibility state
 
 const handleApplyFilter = (filters) => {
   activeFilters.value = filters;
@@ -163,5 +155,10 @@ const emitSearch = () => {
 }
 .toolbar__icon:hover {
   background: #f1f2f4;
+}
+.toolbar__icon.filter--active {
+  color: #2680eb;
+  border-color: #2680eb;
+  background: #eff6ff;
 }
 </style>

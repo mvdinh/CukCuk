@@ -1,9 +1,9 @@
 .content {
-  background: url(https://amisplatform.misacdn.net/images/imagesapps/recruit/background_default1.jpg);
+  background: #D5D7DA;
   font-family: Inter;
   box-sizing: border-box;
   position: absolute;
-  width: calc(100% - 232px);
+  width: calc(100% - 200px);
   height: calc(100% - 48px);
   right: 0;
   bottom: 0;

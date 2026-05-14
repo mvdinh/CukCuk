@@ -29,7 +29,7 @@
     <!-- RIGHT -->
     <div class="navbar__right">
       <!-- Setting -->
-      <MsButton type="icon">
+      <MsButton type="icon" @click="columnStore.toggleConfig()">
         <MsIcon :size="24" :webkitMaskImage="icons.navbar.settings" />
       </MsButton>
 
@@ -77,8 +77,10 @@ import { inject } from "vue";
 
 import MsIcon from "./ms-icon/MsIcon.vue";
 import MsButton from "./ms-button/MsButton.vue";
+import { useColumnStore } from "../stores/columnStore";
 
 const icons = inject("icons");
+const columnStore = useColumnStore();
 </script>
 
 <style lang="scss" scoped>

@@ -8,29 +8,39 @@
           v-model:searchText="searchText"
           :selectedIds="[]"
           @search="handleSearchEnter"
-          @filter="handleFilter"
           @reload="loadData"
-          @configColumns="showColumnConfig = true"
+          @configColumns="columnStore.showConfig = true"
         />
 
-        <div class="content__body__table">
-          <div v-if="rows.length === 0" class="table__empty-overlay">
-            <span class="table__empty-message">
-              Không tìm thấy dữ liệu phù hợp
-            </span>
+        <div class="content__body__main">
+          <div
+            class="content__body__table"
+            :class="{ 'table--with-filter': filterStore.showAdvancedFilter }"
+          >
+            <div v-if="rows.length === 0" class="table__empty-overlay">
+              <span class="table__empty-message">
+                Không tìm thấy dữ liệu phù hợp
+              </span>
+            </div>
+
+            <div class="table-wrapper">
+              <MsTable
+                :rows="rows"
+                :fields="tableColumns"
+                :hasCheckbox="false"
+                filterable
+                @edit="handleEdit"
+                @delete="handleDelete"
+                @filter="handleFilter"
+              />
+            </div>
           </div>
 
-          <div class="table-wrapper">
-            <MsTable
-              :rows="rows"
-              :fields="visibleFields"
-              :hasCheckbox="false"
-              filterable
-              @edit="handleEdit"
-              @delete="handleDelete"
-              @filter="handleFilter"
-            />
-          </div>
+          <InventoryFilter
+            v-if="filterStore.showAdvancedFilter"
+            v-model="filterStore.showAdvancedFilter"
+            @apply="handleFilter"
+          />
         </div>
 
         <MsPagination
@@ -41,19 +51,18 @@
         />
       </div>
     </div>
-
-    <ColumnConfigDialog
-      v-model="showColumnConfig"
-      :columns="allFields"
-      @apply="handleApplyConfig"
-      @reset="handleResetConfig"
-    />
   </div>
 </template>
- 
 
 <script>
-import { defineComponent, getCurrentInstance, watch, onMounted, ref, computed } from "vue";
+import {
+  defineComponent,
+  getCurrentInstance,
+  watch,
+  onMounted,
+  ref,
+  computed,
+} from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
 
@@ -61,11 +70,13 @@ import MsTable from "../components/ms-table/MsTable.vue";
 import MsPagination from "../components/ms-pagination/MsPagination.vue";
 import ContentHeader from "../components/Content/ContentHeader.vue";
 import CandidateToolbar from "../components/Content/CandidateToolbar.vue";
-import ColumnConfigDialog from "./dialogs/ColumnConfigDialog.vue";
 import BaseList from "../base/BaseList";
 import fieldMenuData from "../assets/data/fieldMenu.js";
+import { useColumnStore } from "../stores/columnStore";
+import { useFilterStore } from "../stores/filterStore";
 import { toast } from "../utils/toast";
 import { confirmDialog } from "../utils/confirm";
+import InventoryFilter from "../components/Content/InventoryFilter.vue";
 
 export default defineComponent({
   name: "InventoryList",
@@ -75,6 +86,7 @@ export default defineComponent({
     MsPagination,
     ContentHeader,
     CandidateToolbar,
+    InventoryFilter,
   },
 
   extends: BaseList,
@@ -90,23 +102,31 @@ export default defineComponent({
     const { proxy } = getCurrentInstance();
     const router = useRouter();
     const route = useRoute();
+    const columnStore = useColumnStore();
+    const filterStore = useFilterStore();
+
+    // Dùng cột từ store (đã lọc visible)
+    const tableColumns = computed(() => {
+      return columnStore.inventoryColumns.filter((c) => c.visible !== false);
+    });
 
     const loadData = async () => {
       try {
         proxy.loading = true;
 
         const filtersArray = [];
-        if (proxy.filters) {
-          Object.keys(proxy.filters).forEach(key => {
-            if (proxy.filters[key]) {
-              filtersArray.push({
-                Field: key,
-                Value: proxy.filters[key],
-                Operator: "contains"
-              });
-            }
-          });
-        }
+        const columnFilters = filterStore.columnFilters;
+
+        Object.keys(columnFilters).forEach((key) => {
+          const filter = columnFilters[key];
+          if (filter.active && filter.value) {
+            filtersArray.push({
+              Field: key,
+              Value: filter.value,
+              Operator: filter.operator || "contains",
+            });
+          }
+        });
 
         const payload = {
           textSearch: proxy.searchText || "",
@@ -199,7 +219,10 @@ export default defineComponent({
     };
 
     const handleEdit = (row) => {
-      router.push({ name: "inventory-edit", params: { id: row.inventoryItemID } });
+      router.push({
+        name: "inventory-edit",
+        params: { id: row.inventoryItemID },
+      });
     };
 
     watch(
@@ -217,21 +240,6 @@ export default defineComponent({
       loadData();
     });
 
-    const allFields = ref([...fieldMenuData.map(f => ({ ...f, visible: true }))]);
-    const showColumnConfig = ref(false);
-
-    const visibleFields = computed(() => {
-      return allFields.value.filter(f => f.visible);
-    });
-
-    const handleApplyConfig = (newCols) => {
-      allFields.value = newCols;
-    };
-
-    const handleResetConfig = () => {
-      allFields.value = [...fieldMenuData.map(f => ({ ...f, visible: true }))];
-    };
-
     return {
       loadData,
       handlePagingChange,
@@ -241,12 +249,9 @@ export default defineComponent({
       handleImport,
       handleAdd,
       handleEdit,
-
-      allFields,
-      visibleFields,
-      showColumnConfig,
-      handleApplyConfig,
-      handleResetConfig,
+      tableColumns,
+      columnStore,
+      filterStore,
     };
   },
 
@@ -264,4 +269,36 @@ export default defineComponent({
 
 <style>
 @import url("../assets/styles/employees.css");
+
+.content__body__container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.content__body__main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.content__body__table {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent parent from scrolling, let table-wrapper do it */
+  transition: all 0.3s ease;
+  min-width: 0;
+}
+
+.table-wrapper {
+  flex: 1;
+  overflow: auto; /* Both x and y scrolling */
+  width: 100%;
+}
+
+.table--with-filter {
+  /* No special margin needed since it's a flex sibling */
+}
 </style>

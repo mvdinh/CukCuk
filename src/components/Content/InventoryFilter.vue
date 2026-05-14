@@ -1,120 +1,141 @@
 <template>
   <div class="inventory-filter" v-if="modelValue">
-    <div class="filter__overlay" @click="close"></div>
     <div class="filter__content">
       <div class="filter__header">
         <h3>Bộ lọc</h3>
-        <div class="filter__close" @click="close" style="cursor: pointer">
-          &times;
-        </div>
+        <div class="filter__close" @click="close">✕</div>
       </div>
 
       <div class="filter__body">
-        <!-- Lọc theo Loại món -->
-        <div class="filter__row">
-          <MsSelect
-            label="Loại món"
-            v-model="filters.itemType"
-            :options="typeOptions"
-            placeholder="Tất cả"
-          />
+        <div class="search-box">
+          <MsInput v-model="searchText" placeholder="Tìm kiếm" isSearch />
         </div>
 
-        <!-- Lọc theo Nhóm thực đơn -->
-        <div class="filter__row">
-          <MsSelect
-            label="Nhóm thực đơn"
-            v-model="filters.category"
-            :options="categoryOptions"
-            placeholder="Tất cả"
-          />
-        </div>
-
-        <!-- Lọc theo Giá bán -->
-        <div class="filter__row">
-          <div class="ms-input__label">Giá bán</div>
-          <div class="flex-row">
-            <MsInput type="number" v-model="filters.minPrice" placeholder="Từ" />
-            <MsInput type="number" v-model="filters.maxPrice" placeholder="Đến" />
+        <div class="filter-list">
+          <div v-for="col in filteredColumns" :key="col.key" class="filter-item">
+            <div class="filter-item-header">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" v-model="filterStore.columnFilters[col.key].active" />
+                <span>{{ col.label }}</span>
+              </label>
+            </div>
+            
+            <div v-if="filterStore.columnFilters[col.key].active" class="filter-item-controls">
+              <select v-model="filterStore.columnFilters[col.key].operator" class="filter-select">
+                <option value="contains">Chứa</option>
+                <option value="equals">Bằng</option>
+                <option value="starts_with">Bắt đầu bằng</option>
+                <option value="ends_with">Kết thúc bằng</option>
+                <option value="not_contains">Không chứa</option>
+              </select>
+              <MsInput v-model="filterStore.columnFilters[col.key].value" placeholder="Giá trị" />
+            </div>
           </div>
         </div>
       </div>
 
       <div class="filter__footer">
-        <MsButton type="secondary" @click="clearFilters">Bỏ lọc</MsButton>
-        <MsButton type="primary" @click="applyFilters">Áp dụng</MsButton>
+        <button class="btn-secondary" @click="clearAll">Bỏ lọc</button>
+        <button class="btn-primary" @click="applyFilters">Áp dụng</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { reactive, watch, computed } from "vue";
-import MsSelect from "../ms-select/MsSelect.vue";
+import { ref, computed, onMounted } from "vue";
 import MsInput from "../ms-input/MsInput.vue";
 import MsButton from "../ms-button/MsButton.vue";
-import { useCategoryStore } from "../../stores/categoryStore";
+import fieldMenuData from "../../assets/data/fieldMenu.js";
+import { useFilterStore } from "../../stores/filterStore";
 
 const props = defineProps({
-  modelValue: Boolean,
-  currentFilters: Object
+  modelValue: Boolean
 });
 
 const emit = defineEmits(["update:modelValue", "apply"]);
 
-const categoryStore = useCategoryStore();
+const filterStore = useFilterStore();
+const searchText = ref("");
 
-const filters = reactive({
-  itemType: null,
-  category: null,
-  minPrice: null,
-  maxPrice: null
+// Khởi tạo filters nếu chưa có
+onMounted(() => {
+  fieldMenuData.forEach(col => {
+    if (col.key && !filterStore.columnFilters[col.key]) {
+      filterStore.setFilter(col.key, { operator: 'contains', value: '', active: false });
+    }
+  });
 });
 
-const typeOptions = [
-  { value: "Món ăn", label: "Món ăn" },
-  { value: "Đồ uống", label: "Đồ uống" },
-  { value: "Khác", label: "Khác" }
-];
-
-const categoryOptions = computed(() => 
-  categoryStore.categories.map(c => ({ value: c.inventoryItemCategoryID, label: c.inventoryItemCategoryName }))
-);
-
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    categoryStore.fetchCategories();
-    Object.assign(filters, props.currentFilters);
-  }
+const filteredColumns = computed(() => {
+  const colsWithKey = fieldMenuData.filter(c => c.key);
+  if (!searchText.value) return colsWithKey;
+  return colsWithKey.filter(c => c.label.toLowerCase().includes(searchText.value.toLowerCase()));
 });
 
 const close = () => emit("update:modelValue", false);
 
 const applyFilters = () => {
-  emit("apply", { ...filters });
+  emit("apply", filterStore.columnFilters);
   close();
 };
 
-const clearFilters = () => {
-  Object.assign(filters, { itemType: null, category: null, minPrice: null, maxPrice: null });
-  emit("apply", { ...filters });
-  close();
+const clearAll = () => {
+  filterStore.clearAll();
+  emit("apply", filterStore.columnFilters);
 };
 </script>
 
 <style scoped lang="scss">
 .inventory-filter {
-  position: absolute; top: 40px; right: 0; z-index: 1000;
+  height: 100%;
+  z-index: 10;
+  flex-shrink: 0;
 }
-.filter__overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 999; }
 .filter__content {
-  position: relative; z-index: 1000; width: 350px; background: #fff; border-radius: 4px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.16); border: 1px solid #e0e0e0;
+  position: relative;
+  width: 280px;
+  height: 100%;
+  background: #fff;
+  border-left: 1px solid #e0e0e0;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
 }
-.filter__header { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #e0e0e0; }
-.filter__body { padding: 16px; display: flex; flex-direction: column; gap: 16px; }
-.filter__row { display: flex; flex-direction: column; gap: 8px; }
-.filter__footer { padding: 16px; border-top: 1px solid #e0e0e0; display: flex; justify-content: flex-end; gap: 8px; }
-.ms-input__label { font-size: 13px; font-weight: 600; color: #333; }
-.flex-row { display: flex; gap: 8px; }
+.filter__header {
+  padding: 16px; border-bottom: 1px solid #e0e0e0;
+  display: flex; justify-content: space-between; align-items: center;
+  h3 { margin: 0; font-size: 16px; }
+  .filter__close { cursor: pointer; color: #999; font-size: 18px; }
+}
+.filter__body {
+  flex: 1; overflow-y: auto; padding: 16px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.filter-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.filter-item {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.filter-item-header {
+  .checkbox-wrapper {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    span { font-size: 13px; font-weight: 500; }
+  }
+}
+.filter-item-controls {
+  padding-left: 24px; display: flex; flex-direction: column; gap: 8px;
+  .filter-select {
+    height: 32px; border: 1px solid #e0e0e0; border-radius: 4px; outline: none; padding: 0 8px;
+    &:focus { border-color: #2680eb; }
+  }
+}
+.filter__footer {
+  padding: 16px; border-top: 1px solid #e0e0e0; background: #f9f9f9;
+  display: flex; justify-content: flex-end; gap: 8px;
+}
+
+.btn-primary { background: #2680eb; color: #fff; border: none; border-radius: 4px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
+.btn-secondary { background: #fff; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
 </style>

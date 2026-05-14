@@ -56,4 +56,7 @@ button.content__header__action__add__left {
   border-right: 1px solid #e0e0e0 !important;
   border-radius: 0 !important;
 }
+.content__header__title{
+  color: black;
+}
 </style>
