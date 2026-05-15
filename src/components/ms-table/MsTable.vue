@@ -9,7 +9,9 @@
         <col
           v-for="field in flatFields"
           :key="'col_' + field.key"
-          :style="{ width: (colWidths[field.key] || field.width || 160) + 'px' }"
+          :style="{
+            width: (colWidths[field.key] || field.width || 160) + 'px',
+          }"
         />
         <col style="width: 80px; min-width: 80px" />
       </colgroup>
@@ -60,7 +62,9 @@
               'col--pinned': field.fixed,
               'col--last-pinned': isLastPinned(field.key),
             }"
-            :style="field.fixed ? { left: getStickyLeft(field.key) + 'px' } : {}"
+            :style="
+              field.fixed ? { left: getStickyLeft(field.key) + 'px' } : {}
+            "
           >
             <div
               class="header-content"
@@ -115,7 +119,9 @@
                 />
               </div>
               <div class="popup-footer">
-                <button class="btn-text" @click="clearLocalFilter">Bỏ lọc</button>
+                <button class="btn-text" @click="clearLocalFilter">
+                  Bỏ lọc
+                </button>
                 <div class="footer-right">
                   <button class="btn-white" @click="activeFilterKey = null">
                     Hủy
@@ -145,7 +151,11 @@
           :class="{ 'row--selected': selected.includes(item[rowKey]) }"
           @dblclick="handleEdit(item)"
         >
-          <td v-if="hasCheckbox" class="col-checkbox col--pinned" style="left: 0">
+          <td
+            v-if="hasCheckbox"
+            class="col-checkbox col--pinned"
+            style="left: 0"
+          >
             <input
               type="checkbox"
               :checked="selected.includes(item[rowKey])"
@@ -195,7 +205,12 @@
             <div class="table__action">
               <MsButton
                 type="secondary"
-                :icon="{ url: icons.table.swap_resize, x: 0, y: 0, color: '#1f1f1f' }"
+                :icon="{
+                  url: icons.table.swap_resize,
+                  x: 0,
+                  y: 0,
+                  color: '#1f1f1f',
+                }"
                 @click="handleEdit"
                 class="btn__action"
               />

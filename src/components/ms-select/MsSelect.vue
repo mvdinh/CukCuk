@@ -14,28 +14,52 @@
         'ms-select__group--split': allowAdd,
       }"
     >
-      <!-- SELECT -->
-      <select
-        class="ms-select__input"
-        :value="modelValue"
-        @change="handleChange"
+      <div
+        class="select__container"
+        :class="{
+          'select__container--split': allowAdd && !iconsInside,
+        }"
       >
-        <option value="" disabled hidden>
-          {{ placeholder || "Chọn giá trị" }}
-        </option>
-
-        <option
-          v-for="option in options"
-          :key="option.value"
-          :value="option.value"
+        <select
+          class="ms-select__input"
+          :value="modelValue"
+          @change="handleChange"
         >
-          {{ option.label }}
-        </option>
-      </select>
+          <option value="" disabled hidden>
+            {{ placeholder || "Chọn giá trị" }}
+          </option>
 
-      <!-- ADD -->
+          <option
+            v-for="option in options"
+            :key="option.value"
+            :value="option.value"
+          >
+            {{ option.label }}
+          </option>
+        </select>
+
+        <!-- Icons at the end of the input -->
+        <div class="select__icons">
+          <div class="select__arrow"></div>
+          <MsIcon 
+            v-if="allowSearch" 
+            :webkitMaskImage="icons.table.search" 
+            :size="16" 
+            class="icon-action"
+            @click.stop="$emit('search')"
+          />
+          <MsIcon 
+            v-if="allowAdd && iconsInside" 
+            :webkitMaskImage="icons.form.plus" 
+            :size="16" 
+            class="icon-action icon-plus"
+            @click.stop="$emit('add')"
+          />
+        </div>
+      </div>
+
       <button
-        v-if="allowAdd"
+        v-if="allowAdd && !iconsInside"
         type="button"
         class="ms-select__add"
         @click="$emit('add')"
@@ -68,9 +92,19 @@ defineProps({
     type: Boolean,
     default: false,
   },
+
+  allowSearch: {
+    type: Boolean,
+    default: false,
+  },
+
+  iconsInside: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(["update:modelValue", "add"]);
+const emit = defineEmits(["update:modelValue", "add", "search"]);
 
 const handleChange = (event) => {
   emit("update:modelValue", event.target.value);
@@ -99,74 +133,106 @@ const handleChange = (event) => {
 .ms-select__group {
   display: flex;
   align-items: center;
-
   width: 100%;
 }
 
-/* có split */
+/* có nút add */
 .ms-select__group--split {
   border: 1px solid #d0d0d0;
-  border-radius: 4px;
-
+  border-radius: 8px;
   overflow: hidden;
+}
+
+/* ================= CONTAINER ================= */
+
+.select__container {
+  width: 100%;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+
+  /* border nằm ở container */
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+
+  background-color: #fff;
+
+  padding: 0;
+}
+
+.select__icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 8px;
+}
+
+.icon-action {
+  cursor: pointer;
+  color: #666;
+  &:hover {
+    color: #2680eb;
+  }
+}
+
+.icon-plus {
+  color: #0072bc;
+  &:hover {
+    color: #005a96;
+  }
+}
+
+.select__arrow {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #666;
+  margin: 0 4px;
+}
+
+.select__container:focus-within {
+  border-color: #8b5cf6;
+}
+
+/* khi có nút add: bỏ border, bỏ border-radius (group đã xử lý) */
+.select__container--split {
+  border: none;
+  border-radius: 0;
 }
 
 /* ================= SELECT ================= */
 
 .ms-select__input {
   width: 100%;
-  height: 36px;
+  height: 18px;
 
-  padding: 0 12px;
+  padding: 0 4px 0 12px;
 
-  border: 1px solid #d0d0d0;
-  border-radius: 4px;
-
+  /* bỏ border — container đã xử lý */
+  border: none;
   outline: none;
+  background: transparent;
 
   font-size: 14px;
   color: #333;
 
-  background-color: #fff;
-
   cursor: pointer;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  background-image:
-    linear-gradient(45deg, transparent 50%, #666 50%),
-    linear-gradient(135deg, #666 50%, transparent 50%);
-
-  background-position:
-    calc(100% - 16px) 15px,
-    calc(100% - 11px) 15px;
-
-  background-size: 5px 5px;
-
-  background-repeat: no-repeat;
-}
-
-.ms-select__input:focus {
-  border-color: #8b5cf6;
-}
-
-/* khi có nút + */
-.ms-select__group--split .ms-select__input {
-  border: none;
-  border-radius: 0;
 }
 
 /* ================= ADD ================= */
 
 .ms-select__add {
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
 
   border: none;
   border-left: 1px solid #d0d0d0;
+
+  /* chỉ bo góc trên phải và dưới phải */
+  border-radius: 0 8px 8px 0;
 
   background-color: #fff;
 
@@ -176,7 +242,6 @@ const handleChange = (event) => {
 
   font-size: 20px;
   color: #666;
-
   cursor: pointer;
 
   transition: background-color 0.2s;
