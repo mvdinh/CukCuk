@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import fieldMenuData from "../assets/data/fieldMenu.js";
 
 export const useFilterStore = defineStore("filter", {
   state: () => ({
@@ -27,7 +28,16 @@ export const useFilterStore = defineStore("filter", {
       });
     },
     toggleAdvancedFilter() {
+      if (!this.showAdvancedFilter) {
+        // Khởi tạo data cho filters trước khi mở popup
+        fieldMenuData.forEach(col => {
+          if (col.key && !this.columnFilters[col.key]) {
+            this.setFilter(col.key, { operator: 'contains', value: '', active: false });
+          }
+        });
+      }
       this.showAdvancedFilter = !this.showAdvancedFilter;
+      console.log("toggleAdvancedFilter called, showAdvancedFilter is now:", this.showAdvancedFilter);
     }
   },
 });

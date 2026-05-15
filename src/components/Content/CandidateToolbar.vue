@@ -53,6 +53,7 @@
             color: '#1f1f1f',
           }"
           class="table-toolbar__button"
+          @click="filterStore.toggleAdvancedFilter()"
         />
       </div>
     </div>
@@ -61,11 +62,13 @@
 
 <script setup>
 import { computed, inject } from "vue";
+import { useFilterStore } from "../../stores/filterStore";
 
 import MsInput from "../ms-input/MsInput.vue";
 import MsButton from "../ms-button/MsButton.vue";
 
 const icons = inject("icons");
+const filterStore = useFilterStore();
 
 const props = defineProps({
   searchText: {

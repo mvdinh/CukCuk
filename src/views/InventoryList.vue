@@ -2,60 +2,67 @@
   <div class="content">
     <ContentHeader @handleAdd="handleAdd" @handleImport="handleImport" />
 
-    <div class="content__body">
-      <div class="content__body__container">
-        <CandidateToolbar
-          v-model:searchText="searchText"
-          :selectedIds="[]"
-          @search="handleSearchEnter"
-          @reload="loadData"
-          @configColumns="columnStore.showConfig = true"
-        />
+    <div class="content-wrapper">
+      <div class="content__body">
+        <div class="content__body__container">
+          <CandidateToolbar
+            v-model:searchText="searchText"
+            :selectedIds="[]"
+            @search="handleSearchEnter"
+            @reload="loadData"
+            @configColumns="columnStore.showConfig = true"
+          />
 
-        <div class="content__body__main">
-          <div
-            class="content__body__table"
-            :class="{ 'table--with-filter': filterStore.showAdvancedFilter }"
-          >
-            <div v-if="rows.length === 0" class="table__empty-overlay">
-              <span class="table__empty-message">
-                Không tìm thấy dữ liệu phù hợp
-              </span>
-            </div>
+          <div class="content__body__main">
+            <div
+              class="content__body__table"
+              :class="{ 'table--with-filter': filterStore.showAdvancedFilter }"
+            >
+              <div v-if="rows.length === 0" class="table__empty-overlay">
+                <span class="table__empty-message">
+                  Không tìm thấy dữ liệu phù hợp
+                </span>
+              </div>
 
-            <div class="table-wrapper">
-              <MsTable
-                :rows="rows"
-                :fields="tableColumns"
-                :hasCheckbox="false"
-                filterable
-                @edit="handleEdit"
-                @delete="handleDelete"
-                @filter="handleFilter"
-              />
+              <div class="table-wrapper">
+                <MsTable
+                  :rows="rows"
+                  :fields="tableColumns"
+                  :hasCheckbox="false"
+                  filterable
+                  @edit="handleEdit"
+                  @delete="handleDelete"
+                  @filter="handleFilter"
+                />
+              </div>
             </div>
           </div>
 
-          <InventoryFilter
-            v-if="filterStore.showAdvancedFilter"
-            v-model="filterStore.showAdvancedFilter"
-            @apply="handleFilter"
+          <MsPagination
+            :total="totalRows"
+            v-model:currentPage="pageIndex"
+            v-model:pageSize="pageSize"
+            @change="handlePagingChange"
           />
         </div>
-
-        <MsPagination
-          :total="totalRows"
-          v-model:currentPage="pageIndex"
-          v-model:pageSize="pageSize"
-          @change="handlePagingChange"
-        />
       </div>
+      <MsTableFilterPopup
+        v-if="filterStore.showAdvancedFilter"
+        @apply="handleFilter"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import {defineComponent, getCurrentInstance, watch, onMounted, ref, computed} from "vue";
+import {
+  defineComponent,
+  getCurrentInstance,
+  watch,
+  onMounted,
+  ref,
+  computed,
+} from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
 
@@ -69,7 +76,7 @@ import { useColumnStore } from "../stores/columnStore";
 import { useFilterStore } from "../stores/filterStore";
 import { toast } from "../utils/toast";
 import { confirmDialog } from "../utils/confirm";
-import InventoryFilter from "../components/Content/InventoryFilter.vue";
+import MsTableFilterPopup from "./dialogs/MsTableFilterPopup.vue";
 
 export default defineComponent({
   name: "InventoryList",
@@ -79,7 +86,7 @@ export default defineComponent({
     MsPagination,
     ContentHeader,
     CandidateToolbar,
-    InventoryFilter,
+    MsTableFilterPopup,
   },
 
   extends: BaseList,
@@ -263,6 +270,20 @@ export default defineComponent({
 <style>
 @import url("../assets/styles/employees.css");
 
+.content-wrapper {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.content__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+
 .content__body__container {
   display: flex;
   flex-direction: column;
@@ -289,6 +310,5 @@ export default defineComponent({
   width: 100%;
 }
 
-  /* No special margin needed since it's a flex sibling */
-
+/* No special margin needed since it's a flex sibling */
 </style>
