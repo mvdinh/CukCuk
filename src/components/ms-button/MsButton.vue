@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import MsIcon from '../ms-icon/MsIcon.vue';
+import MsIcon from "../ms-icon/MsIcon.vue";
 
 defineProps({
   text: {
@@ -103,6 +103,7 @@ defineEmits(["click"]);
   height: 32px;
   border-radius: 50%;
   padding: 0;
+  overflow: hidden;
 }
 
 .ms-button--icon:hover {
@@ -118,5 +119,14 @@ defineEmits(["click"]);
 .ms-button__text {
   display: flex;
   align-items: center;
+}
+
+.ms-button__icon--centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 0;
+  line-height: 1;
 }
 </style>

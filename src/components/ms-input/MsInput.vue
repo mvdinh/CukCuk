@@ -130,7 +130,7 @@ const errorMessages = computed(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .ms-input {
   display: flex;
   flex-direction: column;
@@ -156,18 +156,11 @@ const errorMessages = computed(() => {
 
   &__field {
     width: 100%;
-    // height: 36px;
     padding: 0 12px;
-    // border: 1px solid #e0e0e0;
-    // border-radius: 4px;
     border: none;
     outline: none;
 
-    // &:focus {
-    //   border-color: #2680eb;
-    // }
     &.input--error {
-      border-color: #ff4d4f;
       padding-right: 36px;
     }
   }
@@ -229,16 +222,39 @@ const errorMessages = computed(() => {
     list-style-type: none;
   }
 
+  &:not(.ms-input--search) {
+    .ms-input__wrapper {
+      border: none;
+    }
+
+    .ms-input__field {
+      height: 36px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+
+      &:focus {
+        border-color: #2680eb;
+      }
+
+      &.input--error {
+        border-color: #ff4d4f;
+        padding-right: 36px;
+      }
+    }
+  }
+
   &--search {
     .ms-input__field {
       padding-left: 36px;
       padding-right: 12px;
       border-radius: 4px;
       width: 100%;
+      border: none;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .ms-input__icon-search {
       position: absolute;
       left: 10px;

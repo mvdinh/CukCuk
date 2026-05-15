@@ -4,7 +4,7 @@ import { useRouter, useRoute } from "vue-router";
 import InventoryDetailHeader from "./components/InventoryDetailHeader.vue";
 import InventoryDetailTabs from "./components/InventoryDetailTabs.vue";
 import InventoryDetailFooter from "./components/InventoryDetailFooter.vue";
-import InventoryDetailForm from "./components/InventoryDetailForm.vue";
+import InventoryDetailMain from "./components/InventoryDetailMain.vue";
 
 const router = useRouter();
 const route = useRoute();
@@ -33,7 +33,7 @@ const handleCancel = () => {
 
       <InventoryDetailTabs v-model="currentTab" />
 
-      <InventoryDetailForm :currentTab="currentTab" />
+      <InventoryDetailMain :currentTab="currentTab" />
 
       <InventoryDetailFooter
         @handleSave="handleSave"

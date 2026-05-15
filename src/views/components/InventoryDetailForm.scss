@@ -1,289 +1,236 @@
-.inventory-form__content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-  background: #f4f5f8;
+.section-title {
+  height: 22px;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
 
-  .tab-content {
-    background: #fff;
-    border-radius: 8px;
-    padding: 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+.general-grid {
+  display: flex;
+  gap: 106px;
 
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 24px;
-    }
+  .image-section {
+    width: 160px;
+    height: 238px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 
-    .general-grid {
+    .image-box {
+      width: 160px;
+      height: 160px;
+      background: #f0f4ff;
+      border-radius: 8px;
+      margin-bottom: 16px;
       display: flex;
-      gap: 64px;
+      align-items: center;
+      justify-content: center;
 
-      .image-section {
-        width: 200px;
-        text-align: center;
-
-        .image-box {
-          width: 160px;
-          height: 160px;
-          background: #f0f4ff;
-          border-radius: 8px;
-          margin: 0 auto 16px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .image-desc {
-          font-weight: 600;
-          margin-bottom: 8px;
-        }
-        .image-sub {
-          font-size: 12px;
-          color: #666;
-          margin-bottom: 16px;
-        }
-        .btn-upload {
-          padding: 6px 16px;
-          border: 1px solid #ccc;
-          background: #fff;
-          border-radius: 4px;
-          cursor: pointer;
-          &:hover {
-            background: #f9f9f9;
-          }
-        }
-      }
-
-      .fields-section {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-
-        /* Override MsInput and MsSelect inside this form to display horizontally */
-        .ms-input,
-        .ms-select {
-          display: grid;
-          grid-template-columns: 180px 1fr;
-          align-items: center;
-          row-gap: 4px;
-
-          .ms-input__label,
-          .ms-select__label {
-            grid-column: 1 / 2;
-            grid-row: 1 / 2;
-            margin: 0;
-          }
-          .ms-input__wrapper,
-          .ms-select__group {
-            grid-column: 2 / 3;
-            grid-row: 1 / 2;
-          }
-          .ms-input__error-list,
-          .ms-select__error-list {
-            grid-column: 2 / 3;
-            grid-row: 2 / 3;
-            margin: 0;
-          }
-        }
-
-        .field-row {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-
-          &.multi-col {
-            flex-direction: row;
-            align-items: flex-end;
-            gap: 16px;
-
-            > * {
-              flex: 1;
-            }
-          }
-
-          /* For textarea specifically */
-          & > .textarea-label {
-            width: 180px;
-            margin: 0;
-          }
-          & > .ms-textarea {
-            flex: 1;
-          }
-          &:has(.ms-textarea) {
-            display: grid;
-            grid-template-columns: 180px 1fr;
-            align-items: flex-start;
-          }
-        }
-
-        .checkbox-label {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 14px;
-          cursor: pointer;
-          height: 36px;
-        }
-
-        .kitchen-select-wrapper {
-          display: grid;
-          grid-template-columns: 180px 1fr;
-          align-items: center;
-          row-gap: 4px;
-
-          label {
-            grid-column: 1 / 2;
-            font-size: 13px;
-            font-weight: 600;
-          }
-
-          .kitchen-tags-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-            border: 1px solid #e0e0e0;
-            padding: 4px 8px;
-            border-radius: 4px;
-            min-height: 36px;
-            background: #fff;
-
-            .kitchen-tag {
-              background: #e6f0ff;
-              color: #2680eb;
-              padding: 4px 8px;
-              border-radius: 4px;
-              font-size: 13px;
-              display: flex;
-              align-items: center;
-              gap: 4px;
-
-              .remove-tag {
-                cursor: pointer;
-                font-weight: bold;
-                &:hover {
-                  color: red;
-                }
-              }
-            }
-
-            .kitchen-dropdown {
-              border: none;
-              outline: none;
-              flex: 1;
-              min-width: 100px;
-              font-size: 14px;
-              background: transparent;
-              cursor: pointer;
-            }
-          }
-        }
-
-        .textarea-label {
-          font-size: 13px;
-          font-weight: 600;
-        }
-        .ms-textarea {
-          width: 100%;
-          height: 80px;
-          border: 1px solid #e0e0e0;
-          border-radius: 4px;
-          padding: 8px 12px;
-          outline: none;
-          resize: vertical;
-          font-family: inherit;
-          &:focus {
-            border-color: #2680eb;
-          }
-        }
+      .image-icon {
+        max-width: 100%;
+        max-height: 100%;
       }
     }
 
-    &.serving {
-      .info-text {
-        font-size: 13px;
-        color: #2680eb;
-        margin-bottom: 16px;
+    .image-desc {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .image-sub {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .btn__actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: flex-start;
+
+      .ms-button {
+        border: 1px solid #c4c6cd !important;
+        border-radius: 8px !important;
       }
-      .serving-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 16px;
 
-        th {
-          text-align: left;
-          padding: 12px;
-          border-bottom: 1px solid #e0e0e0;
-          background: #f9f9f9;
-        }
-        td {
-          padding: 8px;
-          border-bottom: 1px solid #e0e0e0;
-        }
+      // icon đầu tiên: 86x28 + chữ size 12
+      .ms-button:first-child {
+        width: 86px;
+        height: 28px;
+        border-radius: 4px;
+        font-size: 12px;
+        padding: 0 4px !important; // Giảm padding để chữ không bị xuống dòng
 
-        tr:hover td {
-          background-color: rgba(42, 126, 252, 0.1);
+        :deep(.ms-button__text) {
+          width: max-content !important;
         }
+      }
 
-        .flex-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
+      // icon giữa: 28x28
+      .ms-button:nth-child(2) {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+      }
 
-        .flex-1 {
+      // icon cuối: 28x28
+      .ms-button:last-child {
+        width: 28px;
+        height: 28px;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .fields-section {
+    display: flex;
+    flex-direction: column;
+    width: 840px;
+    gap: 10px;
+
+    .ms-input,
+    .ms-select {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      align-items: center;
+      row-gap: 4px;
+
+      .ms-input__label,
+      .ms-select__label {
+        grid-column: 1 / 2;
+        grid-row: 1 / 2;
+        margin: 0;
+      }
+      .ms-input__wrapper,
+      .ms-select__group {
+        grid-column: 2 / 3;
+        grid-row: 1 / 2;
+      }
+      .ms-input__error-list,
+      .ms-select__error-list {
+        grid-column: 2 / 3;
+        grid-row: 2 / 3;
+        margin: 0;
+      }
+    }
+
+    .ms-input.price-input {
+      grid-template-columns: 180px 204px;
+      width: fit-content;
+      flex: 0 0 auto;
+    }
+
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      height: 32px;
+      margin-bottom: 8px;
+      justify-content: center;
+
+      &.multi-col {
+        flex-direction: row;
+        align-items: flex-end;
+        gap: 16px;
+
+        > * {
           flex: 1;
         }
-
-        .btn-icon-add {
-          width: 32px;
-          height: 32px;
-          border: 1px solid #d0d0d0;
-          background: #fff;
-          border-radius: 4px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          color: #2680eb;
-          font-size: 20px;
-          &:hover {
-            background: #f0f4ff;
-          }
-        }
-
-        .table-input {
-          width: 100%;
-          height: 32px;
-          border: 1px solid transparent;
-          padding: 0 8px;
-          outline: none;
-          &:focus {
-            border-color: #2680eb;
-            border-radius: 4px;
-            background: #fff;
-          }
-        }
-        .text-right {
-          text-align: right;
-        }
-        .action-cell {
-          text-align: center;
-          cursor: pointer;
-          color: red;
+        .checkbox-label {
+          flex: 0 0 auto;
         }
       }
-      .btn-add-row {
-        background: transparent;
+
+      &:has(.ms-textarea) {
+        display: grid;
+        grid-template-columns: 180px 1fr;
+        align-items: flex-start;
+        height: auto;
+      }
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      height: 32px;
+    }
+
+    .kitchen-select-wrapper {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      align-items: center;
+      row-gap: 4px;
+
+      label {
+        grid-column: 1 / 2;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .kitchen-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
         border: 1px solid #e0e0e0;
-        padding: 6px 12px;
+        padding: 4px 8px;
         border-radius: 4px;
-        cursor: pointer;
-        &:hover {
-          background: #f9f9f9;
+        min-height: 36px;
+        background: #fff;
+
+        .kitchen-tag {
+          background: #e6f0ff;
+          color: #2680eb;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 13px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .remove-tag {
+            cursor: pointer;
+            font-weight: bold;
+            &:hover {
+              color: red;
+            }
+          }
         }
+
+        .kitchen-dropdown {
+          border: none;
+          outline: none;
+          flex: 1;
+          min-width: 100px;
+          font-size: 14px;
+          background: transparent;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .textarea-label {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .ms-textarea {
+      width: 100%;
+      height: 76px;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 8px 12px;
+      outline: none;
+      resize: vertical;
+      font-family: inherit;
+      &:focus {
+        border-color: #2680eb;
       }
     }
   }

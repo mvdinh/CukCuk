@@ -1,11 +1,21 @@
 <template>
   <div class="inventory-form__footer">
-    <MsButton type="secondary" @click="handleCancel">Hủy</MsButton>
-    <div class="footer-right">
+    <div class="footer_actions">
+      <MsButton
+        type="secondary"
+        @click="handleCancel"
+        text="Hủy"
+        class="btn__action"
+      />
       <MsButton type="secondary" @click="handleSaveAndAdd"
         >Lưu và thêm</MsButton
       >
-      <MsButton type="primary" @click="handleSave">Lưu</MsButton>
+      <MsButton
+        type="primary"
+        @click="handleSave"
+        text="Lưu"
+        class="btn__action"
+      />
     </div>
   </div>
 </template>
@@ -22,16 +32,25 @@ const handleSaveAndAdd = () => emit("handleSave", true);
 
 <style lang="scss" scoped>
 .inventory-form__footer {
-    height: 56px;
-    padding: 0 24px;
-    border-top: 1px solid #e0e0e0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #fff;
+  height: 56px;
+  padding: 0 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: #fff;
 
-    .footer-right {
-      display: flex;
-      gap: 12px;
-    }
-  }</style>
+  .footer_actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  :deep(.ms-button) {
+    height: 32px !important;
+    border-radius: 8px !important;
+  }
+  .btn__action {
+    width: 80px;
+  }
+}
+</style>

@@ -1,17 +1,12 @@
 <template>
   <div class="inventory-form__header">
     <div class="header-left">
-      <div class="back-icon" @click="handleBack">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <path
-            d="M19 12H5M5 12L12 19M5 12L12 5"
-            stroke="#333"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </div>
+      <MsButton
+        type="icon"
+        :icon="{ url: icons.detail.back, x: -2, y: -2, color: '#1f1f1f' }"
+        :size="16"
+        @click="handleBack"
+      />
       <h2>{{ isEdit ? "Sửa thực đơn" : "Thêm thực đơn" }}</h2>
       <div class="item-type-badge">Loại món: Món ăn</div>
     </div>
@@ -19,6 +14,9 @@
 </template>
 
 <script setup>
+import MsButton from "../../components/ms-button/MsButton.vue";
+import { inject } from "vue";
+const icons = inject("icons");
 defineProps({
   isEdit: {
     type: Boolean,
@@ -33,8 +31,7 @@ const handleBack = () => emit("handleBack");
 <style lang="scss">
 .inventory-form__header {
   height: 64px;
-  padding: 0 24px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 0 20px;
   display: flex;
   align-items: center;
   background: #fff;
@@ -42,7 +39,7 @@ const handleBack = () => emit("handleBack");
   .header-left {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 2px 16px;
 
     .back-icon {
       cursor: pointer;
@@ -65,12 +62,14 @@ const handleBack = () => emit("handleBack");
     }
 
     .item-type-badge {
+      width: 154px;
+      height: 32px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 4px 12px;
       border: 1px solid #d0d0d0;
-      border-radius: 16px;
+      border-radius: 8px;
       font-size: 13px;
       font-weight: 500;
       cursor: pointer;
