@@ -1,5 +1,6 @@
 /* Nhúng css base */
 @import url("./base.css");
+@import url("./base/filter.css");
 
 /* Nhúng css icon */
 @import url("./icon.css");

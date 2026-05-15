@@ -55,14 +55,7 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  getCurrentInstance,
-  watch,
-  onMounted,
-  ref,
-  computed,
-} from "vue";
+import {defineComponent, getCurrentInstance, watch, onMounted, ref, computed} from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
 
@@ -293,12 +286,9 @@ export default defineComponent({
 }
 
 .table-wrapper {
-  flex: 1;
-  overflow: auto; /* Both x and y scrolling */
   width: 100%;
 }
 
-.table--with-filter {
   /* No special margin needed since it's a flex sibling */
-}
+
 </style>

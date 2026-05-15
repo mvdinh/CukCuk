@@ -1,0 +1,107 @@
+/* src/assets/styles/base/filter.css */
+
+.column-filter-popup {
+  position: absolute;
+  top: 34px;
+  left: 10px;
+  width: 240px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.113);
+  border: 1px solid #e0e0e0;
+  z-index: 100;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: default;
+  white-space: normal;
+}
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 16px;
+
+  .popup-close {
+    cursor: pointer;
+    color: #999;
+  }
+}
+
+.popup-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .filter-select {
+    height: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    outline: none;
+    padding: 0 8px;
+    font-size: 13px;
+
+    &:focus {
+      border-color: #2680eb;
+    }
+  }
+
+  .filter-input-text {
+    height: 28px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    outline: none;
+    padding: 0 8px;
+    font-size: 13px;
+
+    &:focus {
+      border-color: #2680eb;
+    }
+  }
+}
+
+.popup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  border-top: 1px solid #f1f1f1;
+}
+
+.footer-right {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-text {
+  background: transparent;
+  border: none;
+  color: #2680eb;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 4px;
+}
+
+.btn-white {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px 10px;
+  font-size: 13px;
+}
+
+.btn-primary {
+  background: #2680eb;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px 10px;
+  font-size: 13px;
+}

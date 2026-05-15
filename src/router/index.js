@@ -24,12 +24,12 @@ const router = createRouter({
         {
           path: "/inventory/add",
           name: "inventory-add",
-          component: () => import("../views/InventoryForm.vue"),
+          component: () => import("../views/InventoryDetail.vue"),
         },
         {
           path: "/inventory/edit/:id",
           name: "inventory-edit",
-          component: () => import("../views/InventoryForm.vue"),
+          component: () => import("../views/InventoryDetail.vue"),
         },
       ],
     },

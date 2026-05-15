@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar" :class="{ 'sidebar--collapsed ': isToggle }">
+  <div class="sidebar" :class="{ 'sidebar--collapsed': isToggle }">
     <div class="sidebar_bg">
       <div class="sidebar__menu">
         <template v-for="(item, index) in listItemSidebar" :key="index">
@@ -16,7 +16,6 @@
               :size="item.icon.size || 24"
               :webkitMaskImage="getIconUrl(item.icon.url)"
             />
-
             <MsIcon
               v-else
               :x="item.icon.x"
@@ -25,11 +24,7 @@
               :size="item.icon.size || 24"
               :webkitMaskImage="getIconUrl(item.icon.url)"
             />
-
-            <div class="sidebar__menu__item__text">
-              {{ item.name }}
-            </div>
-
+            <div class="sidebar__menu__item__text">{{ item.name }}</div>
             <div
               v-if="item.hasChildren"
               class="sidebar__menu__item__chevron"
@@ -38,27 +33,38 @@
           <div v-if="item.hasDivider" class="sidebar__divider"></div>
         </template>
       </div>
-      <div class="sidebar__toggle" @click="toggleSidebar">
-        <div class="sidebar__toggle__icon"></div>
-        <div class="sidebar__toggle__text">Thu gọn</div>
-      </div>
     </div>
+
+    <!-- Toggle button: góc dưới bên phải sidebar -->
+    <button class="sidebar__toggle-btn" @click="toggleSidebar">
+      <MsIcon
+        :webkitMaskImage="icons.sidebar.swap"
+        :x="0"
+        :y="0"
+        :size="20"
+        color="#1f1f1f"
+      />
+    </button>
   </div>
 </template>
 
 <script setup>
+import { ref, inject } from "vue";
 import MsIcon from "./ms-icon/MsIcon.vue";
-import { ref } from "vue";
 import { listSidebar } from "../assets/data/sidebar";
 
-// Resolve đường dẫn tới file SVG trong src/assets/image (Vite)
-
-import MsButton from "./ms-button/MsButton.vue";
-
+const icons = inject("icons");
 const isActive = ref(5);
+const isToggle = ref(false);
+const listItemSidebar = ref(listSidebar);
+
+const emit = defineEmits(["toggle"]);
 
 // Tải tất cả các file SVG trong thư mục icons dưới dạng URL
-const iconsGlob = import.meta.glob('../assets/icons/*.svg', { as: 'url', eager: true });
+const iconsGlob = import.meta.glob("../assets/icons/*.svg", {
+  as: "url",
+  eager: true,
+});
 
 /**
  * Hàm tự động resolve đường dẫn ảnh SVG bằng Vite
@@ -66,23 +72,16 @@ const iconsGlob = import.meta.glob('../assets/icons/*.svg', { as: 'url', eager: 
 const getIconUrl = (iconUrl) => {
   if (!iconUrl) return undefined;
   if (iconUrl.startsWith("http")) return iconUrl;
-  
   const path = `../assets/icons/${iconUrl}`;
   return iconsGlob[path] || new URL(path, import.meta.url).href;
 };
 
 /**
  * Thay đổi trạng thái active của menu item
- * @param {number} index
  */
 const toggleActive = (index) => {
   isActive.value = index;
 };
-
-const emit = defineEmits(["toggle"]);
-
-const listItemSidebar = ref(listSidebar);
-const isToggle = ref(false);
 
 /**
  * Thu gọn hoặc mở rộng Sidebar
@@ -93,12 +92,10 @@ const toggleSidebar = () => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 $sidebar-width: 200px;
 $sidebar-collapsed-width: 64px;
 $transition-speed: 0.25s;
-$bg-dark: #0a1623;
-$text-gray: #c5ccd5;
 
 .sidebar {
   position: absolute;
@@ -106,7 +103,6 @@ $text-gray: #c5ccd5;
   left: 0;
   bottom: 0;
   width: $sidebar-width;
-  padding: 32px 0 16px 0;
   color: black;
   background-size: cover;
   overflow: hidden;
@@ -125,9 +121,39 @@ $text-gray: #c5ccd5;
     overflow: hidden;
   }
 
+  &__toggle-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px 0 0 0;
+    border: 1px solid #e0e0e0;
+    background: #e9eaeb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: background-color $transition-speed ease;
+
+    &:hover {
+      background-color: #f2f2f2;
+    }
+
+    &__icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform-origin: center center;
+      transition: transform $transition-speed ease;
+    }
+  }
+
   &__menu {
     flex: 1;
     overflow-y: auto;
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -148,6 +174,7 @@ $text-gray: #c5ccd5;
 
       &--active {
         background-color: #eaf1fb !important;
+
         .sidebar__menu__item__text {
           color: #2979ff !important;
           font-weight: 700;
@@ -160,8 +187,13 @@ $text-gray: #c5ccd5;
         font-weight: 500;
         font-size: 14px;
         white-space: nowrap;
+        overflow: hidden;
         opacity: 1;
-        transition: opacity $transition-speed ease;
+        max-width: 200px;
+        transition:
+          opacity $transition-speed ease,
+          max-width $transition-speed ease,
+          margin-left $transition-speed ease;
       }
 
       &__chevron {
@@ -172,7 +204,8 @@ $text-gray: #c5ccd5;
         transform: rotate(45deg);
         margin-left: auto;
         margin-right: 8px;
-        transition: transform $transition-speed ease;
+        opacity: 1;
+        transition: opacity $transition-speed ease;
       }
     }
   }
@@ -183,51 +216,18 @@ $text-gray: #c5ccd5;
     margin: 4px 12px 16px 12px;
   }
 
-  &__toggle {
-    display: flex;
-    height: 40px;
-    align-items: center;
-    margin: 0 12px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 0 8px;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: all $transition-speed ease;
-
-    &__icon {
-      width: 20px;
-      height: 20px;
-      -webkit-mask-image: url(https://amisplatform.misacdn.net/apps/recruit/assets/images/ICON.svg);
-      -webkit-mask-position: -60px -696px;
-      background-color: #555;
-      transition: transform $transition-speed ease;
-    }
-
-    &__text {
-      color: #1f1f1f;
-      font-size: 14px;
-      font-weight: 700;
-      margin-left: 12px;
-      white-space: nowrap;
-    }
-  }
-
   &--collapsed {
     width: $sidebar-collapsed-width;
 
     .sidebar__menu__item {
-      padding: 8px;
-      margin: 0 8px 12px 8px;
-      justify-content: center;
-
       &__text {
-        display: none;
         opacity: 0;
+        max-width: 0;
+        margin-left: 0;
       }
 
       &__chevron {
-        display: none;
+        opacity: 0;
       }
     }
 
@@ -235,17 +235,8 @@ $text-gray: #c5ccd5;
       margin: 4px 8px 16px 8px;
     }
 
-    .sidebar__toggle {
-      justify-content: center;
-      padding: 0;
-
-      &__text {
-        display: none;
-      }
-
-      &__icon {
-        transform: rotate(180deg);
-      }
+    .sidebar__toggle-btn__icon {
+      transform: rotate(180deg);
     }
   }
 }

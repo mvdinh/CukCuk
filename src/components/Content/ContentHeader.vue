@@ -1,46 +1,48 @@
 <template>
-  <div class="content__header">
-    <div class="content__header__left">
-      <div class="content__header__title">Thực đơn</div>
-    </div>
+  <div class="main-header">
+    <div class="main-header__container">
+      <!-- Left -->
+      <div class="main-header__left">
+        <h2 class="main-header__title">Thực đơn</h2>
+      </div>
 
-    <div class="content__header__right">
-      <MsButton
-        type="secondary"
-        class="content__header__right__btn--import"
-        @click="handleImport"
-        style="margin-right: 12px; background: white; border: 1px solid #d3d5d8;"
-      >
-        <span style="display: flex; align-items: center; gap: 8px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
-          Nhập từ Excel
-        </span>
-      </MsButton>
+      <!-- Right -->
+      <div class="main-header__actions">
+        <!-- Import -->
+        <MsButton
+          type="secondary"
+          text="Nhập từ Excel"
+          :icon="{ url: icons.header.file_import, x: 0, y: 0 }"
+          @click="handleImport"
+        />
 
-      <div class="content__header__action__add" style="display: flex; margin-left: 0;">
+        <!-- Add -->
         <MsButton
           type="primary"
-          class="content__header__action__add__left"
+          text="Thêm"
+          :icon="{ url: icons.header.plus, x: 0, y: 0, color: '#fff' }"
           @click="handleAdd"
-          style="border-radius: 4px 0 0 4px !important; display: flex; align-items: center; gap: 4px;"
-        >
-          <span>+</span>
-          Thêm
-        </MsButton>
+        />
+
+        <!-- More -->
         <MsButton
-          type="primary"
-          class="content__header__action__add__right"
+          type="secondary"
+          :icon="{ url: icons.header.dots, x: 0, y: 0, color: '#1f1f1f' }"
           @click="handleMore"
-          style="border-radius: 0 4px 4px 0 !important; padding: 0 8px; border-left: 1px solid rgba(255,255,255,0.3);"
-        >
-          ...
-        </MsButton>
+          class="btn__more"
+        />
       </div>
     </div>
   </div>
 </template>
+
 <script setup>
+import { inject } from "vue";
+
 import MsButton from "../ms-button/MsButton.vue";
+import MsIcon from "../ms-icon/MsIcon.vue";
+
+const icons = inject("icons");
 
 const emit = defineEmits(["handleAdd", "handleImport", "handleMore"]);
 
@@ -48,15 +50,63 @@ const handleAdd = () => emit("handleAdd");
 const handleImport = () => emit("handleImport");
 const handleMore = () => emit("handleMore");
 </script>
-<style scoped>
-.content__header__action__add {
-  margin-left: 20px;
-}
-button.content__header__action__add__left {
-  border-right: 1px solid #e0e0e0 !important;
-  border-radius: 0 !important;
-}
-.content__header__title{
-  color: black;
+
+<style lang="scss" scoped>
+.main-header {
+  margin: 12px 20px;
+
+  &__container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__left {
+    display: flex;
+    align-items: center;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 36px;
+    color: #1f1f1f;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    :deep(.ms-button) {
+      height: 32px !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 6px !important;
+    }
+
+    :deep(.ms-button__text) {
+      font-size: 14px;
+    }
+
+    :deep(.ms-button__icon) {
+      width: 16px;
+      height: 16px;
+    }
+  }
+  .btn__more {
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 </style>

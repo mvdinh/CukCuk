@@ -4,7 +4,7 @@ export const listSidebar = [
     path: "/dashboard",
     icon: {
       url: "dashboard.svg",
-      },
+    },
   },
   {
     name: "Báo cáo",
@@ -134,6 +134,24 @@ export const listSidebar = [
     path: "/loan",
     icon: {
       url: "Lending.svg",
+      x: 0,
+      y: 0,
+    },
+  },
+  {
+    name: "Kế toán dịch vụ",
+    path: "/loan",
+    icon: {
+      url: "vertical_item.svg",
+      x: 0,
+      y: 0,
+    },
+  },
+  {
+    name: "Sản phẩm",
+    path: "/loan",
+    icon: {
+      url: "logo_CUKCUk.svg",
       x: 0,
       y: 0,
     },
