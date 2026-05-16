@@ -13,14 +13,16 @@
 
         <div class="filter-list">
           <div v-for="col in filteredColumns" :key="col.key" class="filter-item">
-            <div class="filter-item-header">
+            <!-- Header for non-checkbox types -->
+            <div v-if="col.type !== 'checkbox'" class="filter-item-header">
               <label class="checkbox-wrapper">
                 <input type="checkbox" v-model="filterStore.columnFilters[col.key].active" />
                 <span>{{ col.label }}</span>
               </label>
             </div>
-            
-            <div v-if="filterStore.columnFilters[col.key].active" class="filter-item-controls">
+
+            <!-- Controls for non-checkbox types -->
+            <div v-if="col.type !== 'checkbox' && filterStore.columnFilters[col.key].active" class="filter-item-controls">
               <select v-model="filterStore.columnFilters[col.key].operator" class="filter-select">
                 <option value="contains">Chứa</option>
                 <option value="equals">Bằng</option>
@@ -29,6 +31,18 @@
                 <option value="not_contains">Không chứa</option>
               </select>
               <MsInput v-model="filterStore.columnFilters[col.key].value" placeholder="Giá trị" />
+            </div>
+
+            <!-- Single checkbox for checkbox types -->
+            <div v-if="col.type === 'checkbox'" class="filter-item-header">
+              <label class="checkbox-wrapper">
+                <input 
+                  type="checkbox" 
+                  :checked="filterStore.columnFilters[col.key].active"
+                  @change="onCheckboxFilterChange(col.key, $event.target.checked)"
+                />
+                <span>{{ col.label }}</span>
+              </label>
             </div>
           </div>
         </div>
@@ -61,6 +75,12 @@ const filteredColumns = computed(() => {
   if (!searchText.value) return colsWithKey;
   return colsWithKey.filter(c => c.label.toLowerCase().includes(searchText.value.toLowerCase()));
 });
+
+const onCheckboxFilterChange = (key, checked) => {
+  filterStore.columnFilters[key].active = checked;
+  filterStore.columnFilters[key].value = checked ? "1" : "0";
+  filterStore.columnFilters[key].operator = "equals";
+};
 
 const close = () => {
   filterStore.showAdvancedFilter = false;

@@ -18,8 +18,7 @@ export const useCategoryStore = defineStore('category', {
         this.isLoading = false;
       }
     },
-    async addCategory(name) {
-      const payload = { inventoryItemCategoryName: name, inventoryItemCategoryCode: `CAT-${Date.now()}` };
+    async addCategory(payload) {
       const res = await httpClient.post('/categories', payload);
       await this.fetchCategories();
       return res.data;

@@ -119,11 +119,37 @@ export default defineComponent({
 
         Object.keys(columnFilters).forEach((key) => {
           const filter = columnFilters[key];
-          if (filter.active && filter.value) {
+          // Cho phép giá trị 0 (với checkbox)
+          const hasValue =
+            filter.value !== "" &&
+            filter.value !== null &&
+            filter.value !== undefined;
+
+          if (filter.active && hasValue) {
+            let dataType = "string";
+            const fieldDef = fieldMenuData.find((f) => f.key === key);
+
+            if (fieldDef) {
+              if (fieldDef.type === "number") {
+                dataType = "number";
+              } else if (
+                fieldDef.type === "checkbox" ||
+                fieldDef.type === "boolean"
+              ) {
+                // Người dùng yêu cầu truyền dataType là "string" cho checkbox
+                dataType = "string";
+              }
+            }
+
             filtersArray.push({
-              Field: key,
-              Value: filter.value,
-              Operator: filter.operator || "contains",
+              dataType: dataType,
+              operator: filter.operator || "equals",
+              property: key,
+              value:
+                fieldDef &&
+                (fieldDef.type === "checkbox" || fieldDef.type === "boolean")
+                  ? String(filter.value)
+                  : filter.value,
             });
           }
         });

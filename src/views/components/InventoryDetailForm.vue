@@ -4,7 +4,11 @@
     <div class="image-section">
       <div class="image-box">
         <div class="image-placeholder">
-          <img :src="item.imageUrl || icons.Image_placeholder" alt="image" class="image-icon" />
+          <img
+            :src="item.imageUrl || icons.Image_placeholder"
+            alt="image"
+            class="image-icon"
+          />
         </div>
       </div>
       <div class="image-desc">Ảnh món</div>
@@ -21,7 +25,13 @@
           }"
           @click="$refs.fileInput.click()"
         />
-        <input type="file" ref="fileInput" @change="handleFileUpload" accept=".jpg,.jpeg,.png,.gif" style="display: none;" />
+        <input
+          type="file"
+          ref="fileInput"
+          @change="handleFileUpload"
+          accept=".jpg,.jpeg,.png,.gif"
+          style="display: none"
+        />
         <MsButton
           type="icon"
           :icon="{
@@ -117,19 +127,19 @@
           @blur="validateField('salePrice')"
         />
         <label class="checkbox-label">
-          <input 
-            type="checkbox" 
-            :checked="item.marketPriceStatus === 0" 
-            @change="item.marketPriceStatus = $event.target.checked ? 0 : null" 
-          /> 
+          <input
+            type="checkbox"
+            :checked="item.marketPriceStatus === 0"
+            @change="item.marketPriceStatus = $event.target.checked ? 0 : null"
+          />
           Thay đổi theo thời giá
         </label>
         <label class="checkbox-label">
-          <input 
-            type="checkbox" 
-            :checked="item.marketPriceStatus === 1" 
-            @change="item.marketPriceStatus = $event.target.checked ? 1 : null" 
-          /> 
+          <input
+            type="checkbox"
+            :checked="item.marketPriceStatus === 1"
+            @change="item.marketPriceStatus = $event.target.checked ? 1 : null"
+          />
           Điều chỉnh giá tự do
         </label>
       </div>

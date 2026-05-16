@@ -247,6 +247,7 @@ export default defineComponent({
       }
     };
 
+    const handleSave = async (data) => {
       try {
         const isEdit = !!(data.inventoryItemID || data.candidateID);
         const payload = toPascalCasePayload(data);

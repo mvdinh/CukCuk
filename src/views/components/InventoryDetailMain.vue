@@ -120,7 +120,7 @@ export default defineComponent({
           typeStore.fetchTypes(),
           servingStore.fetchPreferences(),
         ]);
-        
+
         if (isEdit.value) {
           await inventoryItemStore.fetchItem(route.params.id);
           const fetchedItem = inventoryItemStore.item;
@@ -252,7 +252,9 @@ export default defineComponent({
     };
 
     const updateServingPrice = (index, id) => {
-      const opt = servingOptions.value.find(o => o.inventoryItemAdditionID === id);
+      const opt = servingOptions.value.find(
+        (o) => o.inventoryItemAdditionID === id,
+      );
       if (opt && item.value.servingPreferences[index]) {
         item.value.servingPreferences[index].price = opt.extraPrice || 0;
       }

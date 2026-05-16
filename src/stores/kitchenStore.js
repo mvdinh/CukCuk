@@ -18,5 +18,15 @@ export const useKitchenStore = defineStore("kitchen", {
         this.isLoading = false;
       }
     },
+    async addKitchen(payload) {
+      try {
+        const response = await httpClient.post("/kitchens", payload);
+        await this.fetchKitchens();
+        return response.data;
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
   },
 });

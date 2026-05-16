@@ -5,25 +5,45 @@
         <h3 class="ms-dialog__title">Thêm Nhóm thực đơn</h3>
         <div class="ms-dialog__close" @click="close">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6L18 18" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path
+              d="M18 6L6 18M6 6L18 18"
+              stroke="#fff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
           </svg>
         </div>
       </div>
-      
+
       <div class="ms-dialog__content">
         <!-- Mã nhóm -->
         <div class="dialog-field-row">
-          <label class="dialog-label">Mã nhóm <span class="required">(*)</span></label>
+          <label class="dialog-label"
+            >Mã nhóm <span class="required">(*)</span></label
+          >
           <div class="dialog-control">
-            <MsInput v-model="formData.categoryCode" :error="errors.categoryCode" :showAllErrors="showAllErrors" @blur="validateField('categoryCode')" />
+            <MsInput
+              v-model="formData.categoryCode"
+              :error="errors.categoryCode"
+              :showAllErrors="showAllErrors"
+              @blur="validateField('categoryCode')"
+            />
           </div>
         </div>
 
         <!-- Tên nhóm -->
         <div class="dialog-field-row">
-          <label class="dialog-label">Tên nhóm <span class="required">(*)</span></label>
+          <label class="dialog-label"
+            >Tên nhóm <span class="required">(*)</span></label
+          >
           <div class="dialog-control">
-            <MsInput v-model="formData.categoryName" :error="errors.categoryName" :showAllErrors="showAllErrors" @blur="validateField('categoryName')" />
+            <MsInput
+              v-model="formData.categoryName"
+              :error="errors.categoryName"
+              :showAllErrors="showAllErrors"
+              @blur="validateField('categoryName')"
+            />
           </div>
         </div>
 
@@ -61,9 +81,17 @@
 
         <!-- Thuộc loại -->
         <div class="dialog-field-row">
-          <label class="dialog-label">Thuộc loại <span class="required">(*)</span></label>
+          <label class="dialog-label"
+            >Thuộc loại <span class="required">(*)</span></label
+          >
           <div class="dialog-control">
-            <MsSelect v-model="formData.type" :options="typeOptions" :error="errors.type" :showAllErrors="showAllErrors" @blur="validateField('type')" />
+            <MsSelect
+              v-model="formData.type"
+              :options="typeOptions"
+              :error="errors.type"
+              :showAllErrors="showAllErrors"
+              @blur="validateField('type')"
+            />
           </div>
         </div>
 
@@ -71,8 +99,12 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Chế biến tại</label>
           <div class="dialog-control flex-row">
-            <MsSelect v-model="formData.kitchenID" :options="kitchenOptions" class="flex-1" />
-            <button class="btn-icon-add">+</button>
+            <MsSelect
+              v-model="formData.kitchenID"
+              :options="kitchenOptions"
+              class="flex-1"
+            />
+            <button class="btn-icon-add" @click="openKitchenDialog">+</button>
           </div>
         </div>
 
@@ -80,7 +112,10 @@
         <div class="dialog-field-row align-start">
           <label class="dialog-label">Diễn giải</label>
           <div class="dialog-control">
-            <textarea class="dialog-textarea" v-model="formData.description"></textarea>
+            <textarea
+              class="dialog-textarea"
+              v-model="formData.description"
+            ></textarea>
           </div>
         </div>
       </div>
@@ -88,9 +123,27 @@
       <div class="ms-dialog__footer split-footer">
         <div class="footer-left">
           <button class="btn btn-help">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="margin-right: 4px;">
-              <circle cx="12" cy="12" r="10" stroke="#2680eb" stroke-width="2"/>
-              <path d="M12 16V16.01M12 8C12 8 15 8 15 11C15 13 12 14 12 14" stroke="#2680eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              style="margin-right: 4px"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="#2680eb"
+                stroke-width="2"
+              />
+              <path
+                d="M12 16V16.01M12 8C12 8 15 8 15 11C15 13 12 14 12 14"
+                stroke="#2680eb"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
             </svg>
             Giúp
           </button>
@@ -101,6 +154,8 @@
         </div>
       </div>
     </div>
+
+    <KitchenDialog v-model="isKitchenDialogOpen" />
   </div>
 </template>
 
@@ -108,30 +163,37 @@
 import { ref, watch, computed } from "vue";
 import MsInput from "../../components/ms-input/MsInput.vue";
 import MsSelect from "../../components/ms-select/MsSelect.vue";
+import KitchenDialog from "./KitchenDialog.vue";
 import { useCategoryStore } from "../../stores/categoryStore";
 import { useKitchenStore } from "../../stores/kitchenStore";
+import { useTypeStore } from "../../stores/typeStore";
 import { toast } from "../../utils/toast";
 
 const props = defineProps({
   modelValue: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "saved"]);
 
 const categoryStore = useCategoryStore();
 const kitchenStore = useKitchenStore();
+const typeStore = useTypeStore();
 
-const typeOptions = [
-  { value: 1, label: "Món ăn" },
-  { value: 2, label: "Đồ uống" },
-  { value: 3, label: "Khác" }
-];
+const typeOptions = computed(() => {
+  return typeStore.types.map((t) => ({
+    value: t.inventoryItemTypeID,
+    label: t.typeName,
+  }));
+});
 
 const kitchenOptions = computed(() => {
-  return kitchenStore.kitchens.map(k => ({ value: k.kitchenID, label: k.kitchenName }));
+  return kitchenStore.kitchens.map((k) => ({
+    value: k.kitchenID,
+    label: k.kitchenName,
+  }));
 });
 
 const formData = ref({
@@ -141,36 +203,49 @@ const formData = ref({
   nameKo: "",
   nameZh: "",
   nameJa: "",
-  type: 1,
+  type: "",
   kitchenID: "",
-  description: ""
+  description: "",
 });
 
 const errors = ref({
   categoryCode: "",
   categoryName: "",
-  type: ""
+  type: "",
 });
 
 const showAllErrors = ref(false);
+const isKitchenDialogOpen = ref(false);
 
-watch(() => props.modelValue, (val) => {
-  if (val) {
-    formData.value = {
-      categoryCode: `CAT-${Date.now()}`,
-      categoryName: "",
-      nameEn: "",
-      nameKo: "",
-      nameZh: "",
-      nameJa: "",
-      type: 1,
-      kitchenID: "",
-      description: ""
-    };
-    errors.value = { categoryCode: "", categoryName: "", type: "" };
-    showAllErrors.value = false;
-  }
-});
+const openKitchenDialog = () => {
+  isKitchenDialogOpen.value = true;
+};
+
+watch(
+  () => props.modelValue,
+  async (val) => {
+    if (val) {
+      formData.value = {
+        categoryCode: `CAT-${Date.now()}`,
+        categoryName: "",
+        nameEn: "",
+        nameKo: "",
+        nameZh: "",
+        nameJa: "",
+        type: "",
+        kitchenID: "",
+        description: "",
+      };
+      errors.value = { categoryCode: "", categoryName: "", type: "" };
+      showAllErrors.value = false;
+
+      // Fetch types if empty
+      if (typeStore.types.length === 0) {
+        await typeStore.fetchTypes();
+      }
+    }
+  },
+);
 
 const close = () => {
   emit("update:modelValue", false);
@@ -193,18 +268,26 @@ const validateAll = () => {
   validateField("categoryCode");
   validateField("categoryName");
   validateField("type");
-  return !errors.value.categoryCode && !errors.value.categoryName && !errors.value.type;
+  return (
+    !errors.value.categoryCode &&
+    !errors.value.categoryName &&
+    !errors.value.type
+  );
 };
 
 const save = async () => {
   showAllErrors.value = true;
   if (!validateAll()) return;
   try {
-    // In actual implementation, we might send more fields.
-    // For now, based on previous categoryStore structure, it takes the name and generates code.
-    await categoryStore.addCategory(formData.value.categoryName);
+    const payload = {
+      inventoryItemTypeID: formData.value.type,
+      kitchenID: formData.value.kitchenID,
+      categoryCode: formData.value.categoryCode,
+      categoryName: formData.value.categoryName,
+    };
+    await categoryStore.addCategory(payload);
     toast.success("Thêm nhóm thực đơn thành công!");
-    emit("saved", formData.value.categoryName);
+    emit("saved", payload);
     close();
   } catch (error) {
     toast.error("Có lỗi xảy ra khi lưu.");
@@ -314,16 +397,16 @@ const save = async () => {
         border-color: #2680eb;
       }
     }
-    
+
     &.flex-row {
       display: flex;
       gap: 8px;
       align-items: center;
-      
+
       .flex-1 {
         flex: 1;
       }
-      
+
       .btn-icon-add {
         width: 36px;
         height: 36px;
@@ -333,7 +416,7 @@ const save = async () => {
         font-size: 20px;
         cursor: pointer;
         color: #2680eb;
-        
+
         &:hover {
           background: #f0f4ff;
         }
@@ -384,7 +467,7 @@ const save = async () => {
     background: #fff;
     border-color: #d0d0d0;
     color: #333;
-    
+
     &:hover {
       background: #f0f0f0;
     }
