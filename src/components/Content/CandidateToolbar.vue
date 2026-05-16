@@ -20,6 +20,7 @@
             color: '#1f1f1f',
           }"
           class="table-toolbar__button"
+          @click="$emit('reload')"
         />
 
         <MsButton
@@ -77,7 +78,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:searchText", "search"]);
+const emit = defineEmits(["update:searchText", "search", "reload"]);
 
 const localSearchText = computed({
   get: () => props.searchText,

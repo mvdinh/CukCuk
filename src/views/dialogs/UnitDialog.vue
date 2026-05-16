@@ -14,7 +14,7 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Đơn vị tính <span class="required">*</span></label>
           <div class="dialog-control">
-            <MsInput v-model="formData.unitName" :error="errors.unitName" @blur="validateField('unitName')" />
+            <MsInput v-model="formData.unitName" :error="errors.unitName" :showAllErrors="showAllErrors" :maxLength="25" @blur="validateField('unitName')" />
           </div>
         </div>
         <div class="dialog-field-row align-start">
@@ -60,10 +60,13 @@ const errors = ref({
   unitName: ""
 });
 
+const showAllErrors = ref(false);
+
 watch(() => props.modelValue, (val) => {
   if (val) {
     formData.value = { unitName: "", description: "" };
     errors.value = { unitName: "" };
+    showAllErrors.value = false;
   }
 });
 
@@ -84,6 +87,7 @@ const validateAll = () => {
 };
 
 const save = async () => {
+  showAllErrors.value = true;
   if (!validateAll()) return;
   try {
     // Call the store to save

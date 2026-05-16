@@ -15,7 +15,7 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Mã nhóm <span class="required">(*)</span></label>
           <div class="dialog-control">
-            <MsInput v-model="formData.categoryCode" :error="errors.categoryCode" @blur="validateField('categoryCode')" />
+            <MsInput v-model="formData.categoryCode" :error="errors.categoryCode" :showAllErrors="showAllErrors" @blur="validateField('categoryCode')" />
           </div>
         </div>
 
@@ -23,7 +23,7 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Tên nhóm <span class="required">(*)</span></label>
           <div class="dialog-control">
-            <MsInput v-model="formData.categoryName" :error="errors.categoryName" @blur="validateField('categoryName')" />
+            <MsInput v-model="formData.categoryName" :error="errors.categoryName" :showAllErrors="showAllErrors" @blur="validateField('categoryName')" />
           </div>
         </div>
 
@@ -63,7 +63,7 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Thuộc loại <span class="required">(*)</span></label>
           <div class="dialog-control">
-            <MsSelect v-model="formData.type" :options="typeOptions" :error="errors.type" @blur="validateField('type')" />
+            <MsSelect v-model="formData.type" :options="typeOptions" :error="errors.type" :showAllErrors="showAllErrors" @blur="validateField('type')" />
           </div>
         </div>
 
@@ -152,6 +152,8 @@ const errors = ref({
   type: ""
 });
 
+const showAllErrors = ref(false);
+
 watch(() => props.modelValue, (val) => {
   if (val) {
     formData.value = {
@@ -166,6 +168,7 @@ watch(() => props.modelValue, (val) => {
       description: ""
     };
     errors.value = { categoryCode: "", categoryName: "", type: "" };
+    showAllErrors.value = false;
   }
 });
 
@@ -194,6 +197,7 @@ const validateAll = () => {
 };
 
 const save = async () => {
+  showAllErrors.value = true;
   if (!validateAll()) return;
   try {
     // In actual implementation, we might send more fields.

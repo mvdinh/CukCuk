@@ -1,301 +1,397 @@
 <template>
-  <div class="ms-dialog-overlay" v-if="modelValue">
-    <div class="ms-dialog serving-selection-dialog">
-      <div class="ms-dialog__header">
-        <h3 class="ms-dialog__title">Chọn sở thích phục vụ</h3>
-        <div class="ms-dialog__close" @click="close">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M18 6L6 18M6 6L18 18" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+  <teleport to="body">
+    <div v-if="modelValue" class="dialog-overlay" @click.self="close">
+      <div class="dialog">
+        <!-- Header -->
+        <div class="dialog__header">
+          <span class="dialog__title">Chọn sở thích phục vụ</span>
+          <button class="dialog__close" @click="close">✕</button>
         </div>
-      </div>
 
-      <div class="ms-dialog__content">
-        <div class="search-bar">
-          <MsInput 
-            v-model="searchText" 
-            placeholder="Nhập sở thích phục vụ cần tìm" 
-            class="flex-1"
+        <!-- Search -->
+        <div class="dialog__search">
+          <MsInput
+            v-model="searchText"
+            :isSearch="true"
+            placeholder="Tìm kiếm sở thích..."
           />
-          <MsButton type="secondary" class="btn-search">
-            <template #icon>
-              <MsIcon :webkitMaskImage="icons.table.search" :size="16" />
-            </template>
-            Tìm kiếm
-          </MsButton>
         </div>
 
-        <div class="table-wrapper">
+        <!-- Table body -->
+        <div class="dialog__body">
           <table class="selection-table">
             <thead>
               <tr>
-                <th style="width: 40px"><input type="checkbox" @change="toggleAll" :checked="isAllSelected" /></th>
-                <th>Sở thích phục vụ</th>
-                <th style="width: 150px">Thu thêm</th>
+                <th class="col-checkbox">
+                  <input
+                    type="checkbox"
+                    :checked="isAllSelected"
+                    :indeterminate="isIndeterminate"
+                    @change="toggleSelectAll"
+                  />
+                </th>
+                <th>Tên sở thích</th>
+                <th class="col-price">Thu thêm (đ)</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="opt in filteredOptions" :key="opt.value" @click="toggleRow(opt.value)">
-                <td><input type="checkbox" :checked="selectedIds.includes(opt.value)" @click.stop /></td>
+              <tr
+                v-for="opt in filteredOptions"
+                :key="opt.value"
+                :class="{ 'row--selected': selectedIds.includes(opt.value) }"
+                @click="toggleSelect(opt.value)"
+              >
+                <td class="col-checkbox">
+                  <input
+                    type="checkbox"
+                    :checked="selectedIds.includes(opt.value)"
+                    @click.stop
+                    @change="toggleSelect(opt.value)"
+                  />
+                </td>
                 <td>{{ opt.label }}</td>
-                <td class="text-right">{{ formatCurrency(opt.price) }}</td>
+                <td class="col-price price-value">
+                  {{
+                    opt.price != null
+                      ? Number(opt.price).toLocaleString("vi-VN") + " đ"
+                      : "—"
+                  }}
+                </td>
+              </tr>
+
+              <tr v-if="filteredOptions.length === 0">
+                <td colspan="3" class="empty-cell">Không có dữ liệu</td>
               </tr>
             </tbody>
           </table>
         </div>
 
-        <div class="pagination">
-          <div class="pagination-left">
-            <MsIcon :webkitMaskImage="icons.table.first" :size="20" />
-            <MsIcon :webkitMaskImage="icons.table.prev" :size="20" />
-            <span>Trang</span>
-            <input type="text" value="1" class="page-input" />
-            <span>trên 1</span>
-            <MsIcon :webkitMaskImage="icons.table.next" :size="20" />
-            <MsIcon :webkitMaskImage="icons.table.last" :size="20" />
-            <MsIcon :webkitMaskImage="icons.table.refresh" :size="20" />
-            <select class="page-size">
-              <option>100</option>
-            </select>
+        <!-- Footer -->
+        <div class="dialog__footer">
+          <button class="btn btn--ghost" @click="$emit('add')">
+            + Thêm mới
+          </button>
+          <div class="dialog__footer__actions">
+            <span class="selected-count" v-if="selectedIds.length > 0">
+              Đã chọn {{ selectedIds.length }}
+            </span>
+            <button class="btn btn--cancel" @click="close">Hủy</button>
+            <button
+              class="btn btn--primary"
+              :disabled="selectedIds.length === 0"
+              @click="confirmSelection"
+            >
+              Xác nhận
+            </button>
           </div>
-          <div class="pagination-right">
-            Hiển thị 1 - {{ filteredOptions.length }} trên {{ filteredOptions.length }} kết quả
-          </div>
-        </div>
-      </div>
-
-      <div class="ms-dialog__footer">
-        <div class="footer-left">
-          <MsButton type="secondary" @click="$emit('add')">
-            <template #icon>
-              <MsIcon :webkitMaskImage="icons.form.plus" :size="16" color="#2680eb" />
-            </template>
-            Thêm...
-          </MsButton>
-        </div>
-        <div class="footer-right">
-          <MsButton type="primary" @click="confirm">
-            <template #icon>
-              <MsIcon :webkitMaskImage="icons.table.check" :size="16" color="#fff" />
-            </template>
-            Chọn
-          </MsButton>
-          <MsButton type="secondary" class="btn-cancel" @click="close">
-            <template #icon>
-              <MsIcon :webkitMaskImage="icons.table.x_circle" :size="16" color="#ef4444" />
-            </template>
-            Hủy bỏ
-          </MsButton>
         </div>
       </div>
     </div>
-  </div>
+  </teleport>
 </template>
 
 <script setup>
-import { ref, computed, inject } from "vue";
+import { ref, computed, watch } from "vue";
 import MsInput from "../../components/ms-input/MsInput.vue";
-import MsButton from "../../components/ms-button/MsButton.vue";
-import MsIcon from "../../components/ms-icon/MsIcon.vue";
 
 const props = defineProps({
-  modelValue: Boolean,
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+  // Mỗi option: { value, label, price }
   options: {
     type: Array,
-    default: () => []
-  }
+    default: () => [],
+  },
 });
 
 const emit = defineEmits(["update:modelValue", "select", "add"]);
 
-const icons = inject("icons");
 const searchText = ref("");
 const selectedIds = ref([]);
 
+// Reset state mỗi lần mở dialog
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) {
+      searchText.value = "";
+      selectedIds.value = [];
+    }
+  },
+);
+
 const filteredOptions = computed(() => {
-  if (!searchText.value) return props.options;
-  return props.options.filter(opt => 
-    opt.label.toLowerCase().includes(searchText.value.toLowerCase())
-  );
+  const q = searchText.value.trim().toLowerCase();
+  if (!q) return props.options;
+  return props.options.filter((o) => o.label?.toLowerCase().includes(q));
 });
 
-const isAllSelected = computed(() => {
-  return filteredOptions.value.length > 0 && selectedIds.value.length === filteredOptions.value.length;
-});
+const isAllSelected = computed(
+  () =>
+    filteredOptions.value.length > 0 &&
+    filteredOptions.value.every((o) => selectedIds.value.includes(o.value)),
+);
 
-const toggleAll = () => {
+const isIndeterminate = computed(
+  () =>
+    selectedIds.value.length > 0 &&
+    !isAllSelected.value &&
+    filteredOptions.value.some((o) => selectedIds.value.includes(o.value)),
+);
+
+const toggleSelect = (id) => {
+  const idx = selectedIds.value.indexOf(id);
+  if (idx === -1) {
+    selectedIds.value.push(id);
+  } else {
+    selectedIds.value.splice(idx, 1);
+  }
+};
+
+const toggleSelectAll = () => {
   if (isAllSelected.value) {
     selectedIds.value = [];
   } else {
-    selectedIds.value = filteredOptions.value.map(opt => opt.value);
+    selectedIds.value = filteredOptions.value.map((o) => o.value);
   }
 };
 
-const toggleRow = (id) => {
-  const index = selectedIds.value.indexOf(id);
-  if (index > -1) {
-    selectedIds.value.splice(index, 1);
-  } else {
-    selectedIds.value.push(id);
-  }
-};
-
-const close = () => emit("update:modelValue", false);
-
-const confirm = () => {
-  emit("select", selectedIds.value);
+const confirmSelection = () => {
+  emit("select", [...selectedIds.value]);
   close();
 };
 
-const formatCurrency = (val) => {
-  return new Intl.NumberFormat('vi-VN', { minimumFractionDigits: 2 }).format(val || 0);
+const close = () => {
+  emit("update:modelValue", false);
 };
 </script>
 
-<style scoped lang="scss">
-.ms-dialog-overlay {
+<style scoped>
+/* Overlay */
+.dialog-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1100;
+  z-index: 2000;
+  animation: fadeIn 0.15s ease;
 }
 
-.serving-selection-dialog {
-  width: 800px;
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Dialog box */
+.dialog {
   background: #fff;
-  border-radius: 4px;
-  border: 4px solid #0072bc;
+  border-radius: 10px;
+  width: 580px;
+  max-height: 78vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.18s ease;
+  overflow: hidden;
+}
 
-  .ms-dialog__header {
-    background: #0072bc;
-    height: 36px;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #fff;
-
-    .ms-dialog__title {
-      font-size: 14px;
-      font-weight: 600;
-      margin: 0;
-    }
-
-    .ms-dialog__close {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-    }
+@keyframes slideUp {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
   }
-
-  .ms-dialog__content {
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-
-    .search-bar {
-      display: flex;
-      gap: 8px;
-      
-      .btn-search {
-        border: 1px solid #d0d0d0;
-        height: 32px;
-        padding: 0 12px;
-        font-size: 13px;
-      }
-    }
-
-    .table-wrapper {
-      height: 300px;
-      overflow-y: auto;
-      border: 1px solid #e0e0e0;
-
-      .selection-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-
-        th, td {
-          border: 1px solid #e0e0e0;
-          padding: 8px;
-          text-align: left;
-          font-size: 13px;
-        }
-
-        th {
-          background: #f5f5f5;
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
-
-        tr:hover {
-          background: #f0f7ff;
-          cursor: pointer;
-        }
-
-        .text-right {
-          text-align: right;
-        }
-      }
-    }
-
-    .pagination {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px;
-      background: #f9f9f9;
-      border: 1px solid #e0e0e0;
-      font-size: 12px;
-
-      .pagination-left {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .page-input {
-          width: 30px;
-          height: 24px;
-          text-align: center;
-          border: 1px solid #d0d0d0;
-        }
-
-        .page-size {
-          height: 24px;
-        }
-      }
-    }
-  }
-
-  .ms-dialog__footer {
-    padding: 8px 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    border-top: 1px solid #e0e0e0;
-
-    .footer-right {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-cancel {
-      color: #333;
-    }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
-.flex-1 { flex: 1; }
+/* Header */
+.dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.dialog__title {
+  font-weight: 600;
+  font-size: 15px;
+  color: #111827;
+}
+
+.dialog__close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  line-height: 1;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.dialog__close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+/* Search */
+.dialog__search {
+  padding: 12px 20px 10px;
+  border-bottom: 1px solid #f3f4f6;
+  flex-shrink: 0;
+}
+
+/* Body / table */
+.dialog__body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.selection-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.selection-table thead th {
+  background: #f9fafb;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: #6b7280;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.col-checkbox {
+  width: 44px;
+  text-align: center !important;
+}
+
+.col-price {
+  width: 150px;
+  text-align: right !important;
+}
+
+.selection-table tbody tr {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.selection-table tbody tr:hover {
+  background: #f0f7ff;
+}
+
+.selection-table tbody tr.row--selected {
+  background: #eff6ff;
+}
+
+.selection-table td {
+  padding: 10px 14px;
+  color: #111827;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.price-value {
+  color: #059669;
+  font-weight: 500;
+  text-align: right;
+}
+
+.empty-cell {
+  text-align: center;
+  color: #9ca3af;
+  padding: 40px 0;
+  font-size: 13px;
+}
+
+/* Footer */
+.dialog__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.dialog__footer__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.selected-count {
+  font-size: 13px;
+  color: #2e90fa;
+  font-weight: 500;
+}
+
+/* Buttons */
+.btn {
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition:
+    background 0.15s,
+    opacity 0.15s;
+  white-space: nowrap;
+}
+
+.btn--ghost {
+  background: none;
+  color: #2e90fa;
+  border: 1px dashed #2e90fa;
+}
+
+.btn--ghost:hover {
+  background: #eff6ff;
+}
+
+.btn--cancel {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn--cancel:hover {
+  background: #e5e7eb;
+}
+
+.btn--primary {
+  background: #2e90fa;
+  color: #fff;
+  min-width: 96px;
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: #1d7eea;
+}
+
+.btn--primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
 </style>

@@ -41,17 +41,17 @@
         <!-- Icons at the end of the input -->
         <div class="select__icons">
           <div class="select__arrow"></div>
-          <MsIcon 
-            v-if="allowSearch" 
-            :webkitMaskImage="icons.table.search" 
-            :size="16" 
+          <MsIcon
+            v-if="allowSearch"
+            :webkitMaskImage="icons.table.trash"
+            :size="16"
             class="icon-action"
             @click.stop="$emit('search')"
           />
-          <MsIcon 
-            v-if="allowAdd && iconsInside" 
-            :webkitMaskImage="icons.form.plus" 
-            :size="16" 
+          <MsIcon
+            v-if="allowAdd && iconsInside"
+            :webkitMaskImage="icons.form.plus"
+            :size="16"
             class="icon-action icon-plus"
             @click.stop="$emit('add')"
           />
@@ -71,6 +71,10 @@
 </template>
 
 <script setup>
+import { inject } from "vue";
+
+const icons = inject("icons");
+
 defineProps({
   modelValue: [String, Number],
 

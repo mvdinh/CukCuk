@@ -36,20 +36,11 @@
       />
 
       <div
-        v-if="showError"
-        class="ms-input__icon-error"
-        :title="errorMessages[0]"
+        v-if="maxLength"
+        class="ms-input__counter-inline"
+        :class="{ 'counter--error': maxLengthError }"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="12" r="10" fill="#ff4d4f" />
-          <path
-            d="M12 7V13M12 17H12.01"
-            stroke="#fff"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+        {{ String(modelValue || "").length }}/{{ maxLength }}
       </div>
     </div>
 
@@ -77,6 +68,7 @@ const props = defineProps({
   searchIcon: { type: String, default: "" },
   showAllErrors: { type: Boolean, default: false },
   required: { type: Boolean, default: false },
+  maxLength: { type: Number, default: null },
 });
 
 const emit = defineEmits(["update:modelValue"]);
@@ -105,11 +97,33 @@ const handleInput = (event) => {
 };
 
 /**
+ * Kiểm tra lỗi nội bộ (như maxLength)
+ */
+const maxLengthError = computed(() => {
+  if (props.maxLength && String(props.modelValue || "").length > props.maxLength) {
+    return `Trường này tối đa ${props.maxLength} ký tự`;
+  }
+  return null;
+});
+
+/**
+ * Trả về danh sách chuỗi lỗi
+ */
+const errorMessages = computed(() => {
+  const errs = [];
+  if (props.error) {
+    if (Array.isArray(props.error)) errs.push(...props.error);
+    else errs.push(props.error);
+  }
+  if (maxLengthError.value) errs.push(maxLengthError.value);
+  return errs.filter(e => !!e);
+});
+
+/**
  * Kiểm tra xem có lỗi hay không
  */
 const hasError = computed(() => {
-  if (!props.error) return false;
-  return Array.isArray(props.error) ? props.error.length > 0 : !!props.error;
+  return errorMessages.value.length > 0;
 });
 
 /**
@@ -119,14 +133,6 @@ const showError = computed(() => {
   if (!hasError.value) return false;
   if (props.showAllErrors) return true;
   return isTouched.value;
-});
-
-/**
- * Trả về danh sách chuỗi lỗi
- */
-const errorMessages = computed(() => {
-  if (!props.error) return [];
-  return Array.isArray(props.error) ? props.error : [props.error];
 });
 </script>
 
@@ -161,16 +167,20 @@ const errorMessages = computed(() => {
     outline: none;
 
     &.input--error {
-      padding-right: 36px;
+      /* Padding right for counter */
     }
   }
 
-  &__icon-error {
+  &__counter-inline {
     position: absolute;
-    right: 8px;
-    display: flex;
-    align-items: center;
-    cursor: help;
+    right: 12px;
+    font-size: 12px;
+    color: #888;
+    background: transparent;
+
+    &.counter--error {
+      color: #ff4d4f;
+    }
   }
 
   &__error-tooltip {
@@ -238,7 +248,6 @@ const errorMessages = computed(() => {
 
       &.input--error {
         border-color: #ff4d4f;
-        padding-right: 36px;
       }
     }
   }

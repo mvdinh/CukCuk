@@ -12,12 +12,24 @@ export const useServingStore = defineStore("serving", {
   }),
   actions: {
     async fetchPreferences() {
-      // Mocking fetch
-      return this.preferences;
+      this.isLoading = true;
+      try {
+        const response = await httpClient.get("/additions");
+        this.preferences = response.data.listData || (Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isLoading = false;
+      }
     },
     async addPreference(preference) {
-      this.preferences.push(preference);
-      return preference;
+      try {
+        const response = await httpClient.post("/additions", preference);
+        this.preferences.push(response.data);
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 });

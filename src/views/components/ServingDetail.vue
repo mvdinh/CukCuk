@@ -35,12 +35,16 @@
         <tr v-for="(pref, index) in servingPreferences" :key="index">
           <td>
             <div class="flex-row">
-              <MsSelect
+              <MsSelectCustom
                 v-model="pref.preferenceID"
                 :options="servingOptions"
-                class="flex-1"
+                :valueField="'inventoryItemAdditionID'"
+                :labelField="'additionName'"
+                :priceField="'extraPrice'"
+                colLabelTitle="Tên sở thích"
+                colPriceTitle="Thu thêm (đ)"
                 :allowAdd="true"
-                @change="updateServingPrice(index, pref.preferenceID)"
+                @change="(id) => updateServingPrice(index, id)"
                 @add="openAddDialog(index)"
               />
             </div>
@@ -79,6 +83,7 @@ import MsSelect from "../../components/ms-select/MsSelect.vue";
 import MsIcon from "../../components/ms-icon/MsIcon.vue";
 import ServingSelectionDialog from "../dialogs/ServingSelectionDialog.vue";
 import ServingDialog from "../dialogs/ServingDialog.vue";
+import MsSelectCustom from "../../components/ms-select/MsSelectCustom.vue";
 
 export default defineComponent({
   name: "ServingDetail",
@@ -88,6 +93,7 @@ export default defineComponent({
     MsIcon,
     ServingSelectionDialog,
     ServingDialog,
+    MsSelectCustom
   },
 
   setup() {
@@ -99,13 +105,12 @@ export default defineComponent({
     const currentEditIndex = ref(-1);
     const localSearchText = ref("");
 
-    // ✅ Dùng computed để luôn trỏ đúng vào mảng reactive
+    // Dùng computed để luôn trỏ đúng vào mảng reactive
     const servingPreferences = computed(() => {
       return formState.item.value?.servingPreferences ?? [];
     });
 
     const handleAddServingRow = () => {
-      // ✅ Truy cập trực tiếp qua formState.item.value
       if (!formState.item.value.servingPreferences) {
         formState.item.value.servingPreferences = [];
       }
@@ -119,20 +124,26 @@ export default defineComponent({
       formState.item.value.servingPreferences.splice(index, 1);
     };
 
+    // Mở dialog chọn từ bảng (ServingSelectionDialog)
     const openSelectionDialog = (index) => {
+      console.log("openSelectionDialog called, index:", index);
+      console.log("showSelectionDialog before:", showSelectionDialog.value);
       currentEditIndex.value = index;
       showSelectionDialog.value = true;
+      console.log("showSelectionDialog after:", showSelectionDialog.value);
     };
-
+    // Mở dialog thêm mới (ServingDialog) — từ nút + trong MsSelect
     const openAddDialog = (index) => {
       currentEditIndex.value = index;
       showAddDialog.value = true;
     };
 
+    // Mở dialog thêm mới từ trong ServingSelectionDialog
     const openAddDialogFromSelection = () => {
       showAddDialog.value = true;
     };
 
+    // Khi user chọn xong trong ServingSelectionDialog
     const handleSelection = (selectedIds) => {
       if (selectedIds.length > 0 && currentEditIndex.value > -1) {
         formState.item.value.servingPreferences[
@@ -142,6 +153,7 @@ export default defineComponent({
       }
     };
 
+    // Khi thêm mới xong trong ServingDialog
     const handleNewPreference = (newPref) => {
       if (currentEditIndex.value > -1) {
         formState.item.value.servingPreferences[
@@ -154,12 +166,13 @@ export default defineComponent({
 
     return {
       icons,
-      servingPreferences, // ✅ dùng computed thay vì item trực tiếp
+      servingPreferences,
       servingOptions: formState.servingOptions,
       updateServingPrice: formState.updateServingPrice,
       showSelectionDialog,
       showAddDialog,
       localSearchText,
+      currentEditIndex,
       handleAddServingRow,
       removeServingRow,
       openSelectionDialog,

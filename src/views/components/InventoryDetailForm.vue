@@ -4,7 +4,7 @@
     <div class="image-section">
       <div class="image-box">
         <div class="image-placeholder">
-          <img :src="icons.Image_placeholder" alt="image" class="image-icon" />
+          <img :src="item.imageUrl || icons.Image_placeholder" alt="image" class="image-icon" />
         </div>
       </div>
       <div class="image-desc">Ảnh món</div>
@@ -19,7 +19,9 @@
             url: icons.form.upload,
             color: '#e6332a',
           }"
+          @click="$refs.fileInput.click()"
         />
+        <input type="file" ref="fileInput" @change="handleFileUpload" accept=".jpg,.jpeg,.png,.gif" style="display: none;" />
         <MsButton
           type="icon"
           :icon="{
@@ -43,6 +45,7 @@
           labelFor="Tên món"
           required
           :error="errors.itemName"
+          :showAllErrors="showAllErrors"
           ref="inputItemName"
           @blur="validateField('itemName')"
         />
@@ -53,6 +56,7 @@
           labelFor="Mã món"
           required
           :error="errors.itemCode"
+          :showAllErrors="showAllErrors"
           ref="inputItemCode"
           @blur="validateField('itemCode')"
         />
@@ -66,9 +70,9 @@
 
       <div class="field-row multi-col">
         <MsSelect
-          v-model="item.itemOrderType"
-          label="Thứ tự món"
-          :options="orderTypeOptions"
+          v-model="item.inventoryItemTypeID"
+          label="Loại thực đơn"
+          :options="typeOptions"
         />
         <label class="checkbox-label">
           <input type="checkbox" v-model="item.isSpecial" />
@@ -92,6 +96,7 @@
           label="Đơn vị tính"
           required
           :error="errors.unitID"
+          :showAllErrors="showAllErrors"
           :options="unitOptions"
           allowAdd
           @add="handleAddUnit"
@@ -107,15 +112,26 @@
           required
           class="price-input"
           :error="errors.salePrice"
+          :showAllErrors="showAllErrors"
           ref="inputSalePrice"
           @blur="validateField('salePrice')"
         />
-        <label class="checkbox-label"
-          ><input type="checkbox" /> Thay đổi theo thời giá</label
-        >
-        <label class="checkbox-label"
-          ><input type="checkbox" /> Điều chỉnh giá tự do</label
-        >
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            :checked="item.marketPriceStatus === 0" 
+            @change="item.marketPriceStatus = $event.target.checked ? 0 : null" 
+          /> 
+          Thay đổi theo thời giá
+        </label>
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            :checked="item.marketPriceStatus === 1" 
+            @change="item.marketPriceStatus = $event.target.checked ? 1 : null" 
+          /> 
+          Điều chỉnh giá tự do
+        </label>
       </div>
 
       <div class="field-row multi-col">
@@ -125,6 +141,7 @@
           labelFor="Giá vốn"
           class="price-input"
           :error="errors.costPrice"
+          :showAllErrors="showAllErrors"
           @blur="validateField('costPrice')"
         />
       </div>
