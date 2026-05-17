@@ -23,10 +23,30 @@ export const useInventoryItemStore = defineStore('inventoryItem', {
     async saveItem(data, isEdit = false) {
       this.isLoading = true;
       try {
+        // Construct standard payload
+        const payload = { ...data };
+
+        // Convert kitchenIDs to kitchens array of objects
+        if (data.kitchenIDs) {
+          payload.kitchens = data.kitchenIDs.map(id => ({ kitchenID: id }));
+          delete payload.kitchenIDs;
+        }
+
+        // Convert servingPreferences to additions array of objects
+        if (data.servingPreferences) {
+          payload.additions = data.servingPreferences
+            .filter(pref => pref.preferenceID)
+            .map(pref => ({
+              inventoryItemAdditionID: pref.preferenceID,
+              extraPrice: pref.price || 0
+            }));
+          delete payload.servingPreferences;
+        }
+
         if (isEdit) {
-          await httpClient.put(`/inventory/${data.inventoryItemID}`, data);
+          await httpClient.put(`/inventory/${payload.inventoryItemID}`, payload);
         } else {
-          await httpClient.post('/inventory', data);
+          await httpClient.post('/inventory', payload);
         }
       } catch (error) {
         this.error = error;

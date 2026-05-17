@@ -32,6 +32,7 @@
             color: '#1f1f1f',
           }"
           class="table-toolbar__button"
+          @click="emitExport"
         />
 
         <MsButton
@@ -78,7 +79,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:searchText", "search", "reload"]);
+const emit = defineEmits(["update:searchText", "search", "reload", "export"]);
 
 const localSearchText = computed({
   get: () => props.searchText,
@@ -87,6 +88,10 @@ const localSearchText = computed({
 
 const emitSearch = () => {
   emit("search");
+};
+
+const emitExport = () => {
+  emit("export");
 };
 </script>
 
@@ -132,7 +137,7 @@ const emitSearch = () => {
 
     :deep(.ms-input__field) {
       font-size: 14px;
-      height: 18px ;
+      height: 18px;
       line-height: 18px !important;
       padding: 0 0 0 24px; // chỉ chừa chỗ cho icon search bên trái
       border: none !important;

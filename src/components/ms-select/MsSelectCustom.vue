@@ -230,7 +230,9 @@ const selectOption = (opt) => {
 
 // Đóng khi click ra ngoài
 const handleOutsideClick = (e) => {
-  if (!rootRef.value?.contains(e.target)) {
+  const isClickInsideSelect = rootRef.value?.contains(e.target);
+  const isClickInsideDropdown = e.target.closest(".ms-dropdown");
+  if (!isClickInsideSelect && !isClickInsideDropdown) {
     closeDropdown();
   }
 };

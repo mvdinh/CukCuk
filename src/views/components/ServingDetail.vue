@@ -148,9 +148,9 @@ export default defineComponent({
       if (currentEditIndex.value > -1) {
         formState.item.value.servingPreferences[
           currentEditIndex.value
-        ].preferenceID = newPref.id;
+        ].preferenceID = newPref.inventoryItemAdditionID || newPref.id;
         formState.item.value.servingPreferences[currentEditIndex.value].price =
-          newPref.price ?? 0;
+          newPref.extraPrice ?? newPref.price ?? 0;
       }
     };
 

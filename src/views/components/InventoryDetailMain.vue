@@ -126,18 +126,36 @@ export default defineComponent({
           const fetchedItem = inventoryItemStore.item;
           Object.assign(item.value, fetchedItem);
 
-          if (fetchedItem.kitchenIDs) {
+          // Map kitchens
+          if (fetchedItem.kitchens && Array.isArray(fetchedItem.kitchens)) {
+            item.value.kitchenIDs = fetchedItem.kitchens.map(
+              (k) => k.kitchenID || k,
+            );
+          } else if (fetchedItem.kitchenIDs) {
             item.value.kitchenIDs = Array.isArray(fetchedItem.kitchenIDs)
               ? fetchedItem.kitchenIDs
               : [fetchedItem.kitchenIDs];
           } else if (fetchedItem.kitchenID) {
             item.value.kitchenIDs = [fetchedItem.kitchenID];
-          } else if (fetchedItem.kitchens) {
-            item.value.kitchenIDs = fetchedItem.kitchens.map(
-              (k) => k.kitchenID || k,
-            );
           } else {
             item.value.kitchenIDs = [];
+          }
+
+          // Map additions to servingPreferences
+          if (fetchedItem.additions && Array.isArray(fetchedItem.additions)) {
+            item.value.servingPreferences = fetchedItem.additions.map((a) => ({
+              preferenceID:
+                a.inventoryItemAdditionID || a.additionID || a.preferenceID,
+              price: a.extraPrice ?? a.price ?? 0,
+            }));
+          } else if (fetchedItem.servingPreferences) {
+            item.value.servingPreferences = Array.isArray(
+              fetchedItem.servingPreferences,
+            )
+              ? fetchedItem.servingPreferences
+              : [];
+          } else {
+            item.value.servingPreferences = [];
           }
 
           item.value.imageUrl =

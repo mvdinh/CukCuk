@@ -7,10 +7,10 @@
         <div class="content__body__container">
           <CandidateToolbar
             v-model:searchText="searchText"
-            :selectedIds="[]"
             @search="handleSearchEnter"
             @reload="loadData"
             @configColumns="columnStore.showConfig = true"
+            @export="handleExport"
           />
 
           <div class="content__body__main">
@@ -65,6 +65,7 @@ import {
 } from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
+import * as XLSX from "xlsx";
 
 import MsTable from "../components/ms-table/MsTable.vue";
 import MsPagination from "../components/ms-pagination/MsPagination.vue";
@@ -109,6 +110,50 @@ export default defineComponent({
     const tableColumns = computed(() => {
       return columnStore.inventoryColumns.filter((c) => c.visible !== false);
     });
+
+    const handleExport = () => {
+      try {
+        console.log("handleExport called");
+        proxy.loading = true;
+
+        if (!proxy.store.data || proxy.store.data.length === 0) {
+          toast.warning("Không có dữ liệu để xuất!");
+          return;
+        }
+
+        // 1. Chuẩn bị dữ liệu để xuất dựa trên các cột đang hiển thị
+        const dataToExport = proxy.store.data.map((row) => {
+          const exportRow = {};
+          tableColumns.value.forEach((col) => {
+            if (col.key) {
+              let value = row[col.key];
+              // Format dữ liệu cho các trường đặc biệt nếu cần
+              if (col.type === "checkbox" || typeof value === "boolean") {
+                value = value ? "Có" : "Không";
+              }
+              // Sử dụng label của cột làm tiêu đề trong Excel
+              exportRow[col.label] = value;
+            }
+          });
+          return exportRow;
+        });
+
+        // 2. Tạo workbook và worksheet
+        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Thực đơn");
+
+        // 3. Xuất file ngay tại client
+        XLSX.writeFile(workbook, `Danh_sach_thuc_don_${Date.now()}.xlsx`);
+
+        toast.success("Xuất file Excel thành công!");
+      } catch (err) {
+        console.error("handleExport error:", err);
+        toast.error("Xuất file Excel thất bại!");
+      } finally {
+        proxy.loading = false;
+      }
+    };
 
     const loadData = async () => {
       try {
@@ -272,6 +317,7 @@ export default defineComponent({
       handleDelete,
       handleSearchEnter,
       handleFilter,
+      handleExport,
       handleImport,
       handleAdd,
       handleEdit,

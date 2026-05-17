@@ -43,6 +43,7 @@
 import { ref, watch } from "vue";
 import MsInput from "../../components/ms-input/MsInput.vue";
 import MsButton from "../../components/ms-button/MsButton.vue";
+import { useServingStore } from "../../stores/servingStore";
 import { toast } from "../../utils/toast";
 
 const props = defineProps({
@@ -53,6 +54,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue", "saved"]);
+
+const servingStore = useServingStore();
 
 const formData = ref({
   name: "",
@@ -90,11 +93,20 @@ const validateAll = () => {
 const save = async () => {
   if (!validateAll()) return;
   try {
-    // In a real app, this might save to an API. 
-    // For now we just emit the saved object.
-    emit("saved", { ...formData.value, id: Date.now() });
-    toast.success("Thêm sở thích phục vụ thành công!");
-    close();
+    const payload = {
+      additionName: formData.value.name,
+      extraPrice: Number(formData.value.price) || 0,
+      description: formData.value.description
+    };
+    
+    const newPref = await servingStore.addPreference(payload);
+    if (newPref) {
+      emit("saved", newPref);
+      toast.success("Thêm sở thích phục vụ thành công!");
+      close();
+    } else {
+      toast.error("Có lỗi xảy ra khi lưu.");
+    }
   } catch (error) {
     toast.error("Có lỗi xảy ra khi lưu.");
   }
