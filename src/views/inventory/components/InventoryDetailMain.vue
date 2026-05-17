@@ -158,7 +158,9 @@ export default defineComponent({
             item.value.servingPreferences = [];
           }
 
-          item.value.imageUrl =
+          item.value.ImgUrl =
+            fetchedItem.ImgUrl ||
+            fetchedItem.imgUrl ||
             fetchedItem.imageUrl ||
             fetchedItem.imagePath ||
             fetchedItem.picture ||
@@ -254,7 +256,7 @@ export default defineComponent({
       }
       try {
         // Fake upload locally, directly use URL.createObjectURL
-        item.value.imageUrl = URL.createObjectURL(file);
+        item.value.ImgUrl = URL.createObjectURL(file);
       } catch (err) {
         alert("Tải ảnh thất bại");
       }

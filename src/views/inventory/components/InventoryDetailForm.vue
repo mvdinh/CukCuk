@@ -5,7 +5,7 @@
       <div class="image-box">
         <div class="image-placeholder">
           <img
-            :src="item.imageUrl || icons.Image_placeholder"
+            :src="item.ImgUrl || icons.Image_placeholder"
             alt="image"
             class="image-icon"
           />
@@ -44,6 +44,7 @@
             url: icons.form.x,
             color: '#e6332a',
           }"
+          @click="clearImage"
         />
       </div>
     </div>
@@ -201,6 +202,16 @@ import MsInput from "../../../components/common/ms-input/MsInput.vue";
 import MsSelect from "../../../components/common/ms-select/MsSelect.vue";
 import MsButton from "../../../components/common/ms-button/MsButton.vue";
 import MsCurrencyInput from "../../../components/common/ms-currency-input/MsCurrencyInput.vue";
+import axios from "axios";
+import { toast } from "../../../utils/toast";
+
+async function sha1(string) {
+  const utf8 = new TextEncoder().encode(string);
+  const hashBuffer = await crypto.subtle.digest("SHA-1", utf8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  return hashHex;
+}
 
 export default defineComponent({
   name: "InventoryDetailForm",
@@ -218,6 +229,52 @@ export default defineComponent({
       icons,
       ...formState,
     };
+  },
+  methods: {
+    clearImage() {
+      this.item.ImgUrl = null;
+    },
+    async handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      try {
+        toast.info("Đang tải ảnh lên...");
+
+        const cloudName = import.meta.env.VITE_CLOUDINARY_NAME?.replace(/['"]/g, "");
+        const apiKey = import.meta.env.VITE_CLOUDINARY_KEY?.replace(/['"]/g, "");
+        const apiSecret = import.meta.env.VITE_CLOUDINARY_SECRET?.replace(/['"]/g, "");
+        const timestamp = Math.round(new Date().getTime() / 1000);
+
+        const stringToSign = `timestamp=${timestamp}${apiSecret}`;
+        const signature = await sha1(stringToSign);
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("api_key", apiKey);
+        formData.append("timestamp", timestamp);
+        formData.append("signature", signature);
+
+        const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+        const response = await axios.post(uploadUrl, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.data && response.data.secure_url) {
+          this.item.ImgUrl = response.data.secure_url;
+          toast.success("Tải ảnh lên thành công!");
+        } else {
+          toast.error("Tải ảnh lên thất bại.");
+        }
+      } catch (error) {
+        console.error("Cloudinary Upload Error:", error);
+        toast.error("Có lỗi xảy ra khi tải ảnh.");
+      } finally {
+        event.target.value = "";
+      }
+    },
   },
 });
 </script>
