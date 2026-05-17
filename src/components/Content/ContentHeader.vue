@@ -39,8 +39,8 @@
 <script setup>
 import { inject } from "vue";
 
-import MsButton from "../ms-button/MsButton.vue";
-import MsIcon from "../ms-icon/MsIcon.vue";
+import MsButton from "../common/ms-button/MsButton.vue";
+import MsIcon from "../common/ms-icon/MsIcon.vue";
 
 const icons = inject("icons");
 

@@ -9,6 +9,6 @@
 </template>
 
 <script setup>
-import MsNotification from "./components/ms-notification/MsNotification.vue";
-import MsPopUp from "./components/ms-popup/MsPopUp.vue";
+import MsNotification from "./components/common/ms-notification/MsNotification.vue";
+import MsPopUp from "./components/common/ms-popup/MsPopUp.vue";
 </script>
