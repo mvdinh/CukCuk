@@ -20,14 +20,14 @@
         <MsButton
           type="primary"
           text="Thêm"
-          :icon="{ url: icons.header.plus, x: 2, y: 6, color: '#fff' }"
+          :icon="{ url: icons.header.plus, x: 3, y: 3, color: '#fff' }"
           @click="handleAdd"
         />
 
         <!-- More -->
         <MsButton
           type="secondary"
-          :icon="{ url: icons.header.dots, x: 0, y: 0, color: '#1f1f1f' }"
+          :icon="{ url: icons.header.dots, x: 2, y: 6, color: '#1f1f1f' }"
           @click="handleMore"
           class="btn__more"
         />

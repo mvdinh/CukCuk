@@ -8,13 +8,22 @@
         @click="handleBack"
       />
       <h2>{{ isEdit ? "Sửa thực đơn" : "Thêm thực đơn" }}</h2>
-      <div class="item-type-badge">Loại món: Món ăn</div>
+      <div class="item-type-badge">
+        <span>Loại món: Món ăn</span>
+        <MsIcon
+          :size="14"
+          :isImage="true"
+          :webkitMaskImage="icons.chevon_down"
+          color="#1f1f1f"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import MsButton from "../../../components/common/ms-button/MsButton.vue";
+import MsIcon from "../../../components/common/ms-icon/MsIcon.vue";
 import { inject } from "vue";
 const icons = inject("icons");
 defineProps({
@@ -62,7 +71,7 @@ const handleBack = () => emit("handleBack");
     }
 
     .item-type-badge {
-      width: 154px;
+      width: auto;
       height: 32px;
       display: inline-flex;
       align-items: center;

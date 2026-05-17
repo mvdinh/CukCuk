@@ -27,7 +27,7 @@
       <thead>
         <tr>
           <th style="width: calc(100% - 350px)">Sở thích phục vụ</th>
-          <th style="width: 300px">Thu thêm (đ)</th>
+          <th style="width: 300px" class="price-header-cell">Thu thêm (đ)</th>
           <th style="width: 50px"></th>
         </tr>
       </thead>
@@ -49,23 +49,25 @@
             />
           </td>
 
-          <!-- Cột 2: giá tự động điền khi chọn, cho phép sửa tay -->
-          <td>
-            <input
-              class="price-input"
-              type="number"
-              :value="pref.price"
-              min="0"
-              @input="pref.price = Number($event.target.value)"
-              @blur="pref.price = Number($event.target.value)"
-            />
+          <!-- Cột 2: hiển thị giá tiền (chỉ đọc) -->
+          <td class="price-display-cell">
+            {{
+              pref.price != null
+                ? Number(pref.price).toLocaleString("vi-VN")
+                : 0
+            }}
           </td>
 
           <!-- Cột 3: xóa dòng -->
           <td class="action-cell">
-            <button class="btn-delete" @click="removeServingRow(index)">
-              🗑️
-            </button>
+            <div class="btn-delete" @click="removeServingRow(index)">
+              <MsIcon
+                :size="18"
+                :isImage="true"
+                :webkitMaskImage="icons.table.trash"
+                color="red"
+              />
+            </div>
           </td>
         </tr>
       </tbody>
@@ -174,27 +176,36 @@ export default defineComponent({
 <style lang="scss" src="./ServingDetail.scss" />
 
 <style scoped>
-.price-input {
-  width: 100%;
-  height: 32px;
-  border: 1px solid #d0d0d0;
+.price-display-cell {
+  text-align: left !important;
+  padding-left: 12px !important;
+  font-size: 13.5px;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.price-header-cell {
+  text-align: left !important;
+  padding-left: 12px !important;
+}
+
+.btn-delete {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 6px;
-  padding: 0 10px;
-  font-size: 14px;
-  color: #111827;
-  outline: none;
-  box-sizing: border-box;
-  background: #fff;
-  transition: border-color 0.15s;
+  cursor: pointer;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  margin: 0 auto;
 }
 
-.price-input:focus {
-  border-color: #2e90fa;
-}
-
-/* Ẩn spinner mặc định nếu muốn gọn hơn */
-.price-input::-webkit-inner-spin-button,
-.price-input::-webkit-outer-spin-button {
-  opacity: 1;
+.btn-delete:hover {
+  background-color: #fff0f0 !important;
+  border-color: #ffccc7 !important;
 }
 </style>

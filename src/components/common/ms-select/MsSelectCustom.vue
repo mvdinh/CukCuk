@@ -9,7 +9,7 @@
     <!-- SELECT GROUP -->
     <div
       class="ms-select__group"
-      :class="{ 'ms-select__group--split': allowAdd }"
+      :class="{ 'ms-select__group--split': allowAdd && !iconsInside }"
     >
       <!-- Trigger box (thay thế <select> mặc định) -->
       <div
@@ -29,16 +29,12 @@
 
         <div class="select__icons" @click.stop>
           <MsIcon
-            v-if="allowAdd && iconsInside"
-            :webkitMaskImage="icons.form.plus"
-            :size="16"
-            class="icon-action icon-plus"
-            @click.stop="$emit('add')"
-          />
-          <div
+            :size="14"
+            :webkitMaskImage="icons.chevon_down"
+            color="#666"
             class="select__arrow"
             :class="{ 'select__arrow--up': isOpen }"
-          ></div>
+          />
         </div>
       </div>
 
@@ -55,17 +51,6 @@
     <!-- Custom dropdown table -->
     <teleport to="body">
       <div v-if="isOpen" class="ms-dropdown" :style="dropdownStyle">
-        <!-- Search trong dropdown -->
-        <div class="ms-dropdown__search">
-          <input
-            ref="searchRef"
-            v-model="searchText"
-            class="ms-dropdown__search-input"
-            placeholder="Tìm kiếm..."
-            @click.stop
-          />
-        </div>
-
         <!-- Table -->
         <div class="ms-dropdown__body">
           <table class="ms-dropdown__table">
@@ -97,19 +82,6 @@
             </tbody>
           </table>
         </div>
-
-        <!-- Footer thêm mới -->
-        <div v-if="allowAdd" class="ms-dropdown__footer" @click.stop>
-          <button
-            class="btn-add-new"
-            @click.stop="
-              $emit('add');
-              closeDropdown();
-            "
-          >
-            + Thêm mới
-          </button>
-        </div>
       </div>
     </teleport>
   </div>
@@ -125,6 +97,7 @@ import {
   onMounted,
   onBeforeUnmount,
 } from "vue";
+import MsIcon from "../ms-icon/MsIcon.vue";
 
 const icons = inject("icons");
 
@@ -345,7 +318,7 @@ onBeforeUnmount(() => {
 }
 
 .icon-plus {
-  color: #0072bc;
+  color: #2680eb;
 }
 
 /* ADD BUTTON */
@@ -361,13 +334,13 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  color: #666;
+  color: #2680eb;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .ms-select__add:hover {
-  background-color: #f5f5f5;
+  background-color: #f2f7ff;
 }
 </style>
 
@@ -398,27 +371,6 @@ onBeforeUnmount(() => {
   }
 }
 
-.ms-dropdown__search {
-  padding: 8px 10px;
-  border-bottom: 1px solid #f0f0f0;
-  flex-shrink: 0;
-}
-
-.ms-dropdown__search-input {
-  width: 100%;
-  height: 28px;
-  border: 1px solid #d0d0d0;
-  border-radius: 6px;
-  padding: 0 10px;
-  font-size: 13px;
-  outline: none;
-  box-sizing: border-box;
-}
-
-.ms-dropdown__search-input:focus {
-  border-color: #2e90fa;
-}
-
 .ms-dropdown__body {
   flex: 1;
   overflow-y: auto;
@@ -431,19 +383,26 @@ onBeforeUnmount(() => {
 }
 
 .ms-dropdown__table thead th {
-  background: #f9fafb;
+  background: #f3f4f6;
   padding: 8px 12px;
-  text-align: left;
+  text-align: center !important;
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: #4b5563;
   border-bottom: 1px solid #e5e7eb;
   position: sticky;
   top: 0;
 }
 
+.ms-dropdown__table th:first-child,
+.ms-dropdown__table td:first-child {
+  border-right: 1px solid #e5e7eb;
+}
+
 .ms-dropdown__table .col-price {
-  width: 130px;
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
   text-align: right;
 }
 
@@ -453,11 +412,11 @@ onBeforeUnmount(() => {
 }
 
 .ms-dropdown__table tbody tr:hover {
-  background: #f0f7ff;
+  background: #f5f5f5;
 }
 
 .ms-dropdown__table tbody tr.row--active {
-  background: #eff6ff;
+  background: #e5e7eb;
   font-weight: 500;
 }
 
@@ -468,7 +427,7 @@ onBeforeUnmount(() => {
 }
 
 .ms-dropdown__table .price-value {
-  color: #059669;
+  color: #1f2937;
   font-weight: 500;
   text-align: right;
 }
@@ -478,28 +437,5 @@ onBeforeUnmount(() => {
   color: #9ca3af;
   padding: 24px;
   font-size: 13px;
-}
-
-.ms-dropdown__footer {
-  border-top: 1px solid #f0f0f0;
-  padding: 8px 12px;
-  flex-shrink: 0;
-}
-
-.btn-add-new {
-  background: none;
-  border: 1px dashed #2e90fa;
-  color: #2e90fa;
-  border-radius: 6px;
-  padding: 4px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  width: 100%;
-  transition: background 0.15s;
-}
-
-.btn-add-new:hover {
-  background: #eff6ff;
 }
 </style>

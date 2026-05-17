@@ -54,8 +54,9 @@
     background: #f9f9f9;
     font-size: 13px;
 
+    &:nth-child(2),
     &:last-child {
-      border-right: none;
+      border-right: none !important;
     }
   }
 
@@ -80,8 +81,9 @@
     border-bottom: 1px solid #e0e0e0;
     border-right: 1px solid #e0e0e0;
 
+    &:nth-child(2),
     &:last-child {
-      border-right: none;
+      border-right: none !important;
     }
 
     :deep(.ms-input__wrapper),
