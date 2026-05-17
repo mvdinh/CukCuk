@@ -1,38 +1,47 @@
 <template>
   <div class="sidebar" :class="{ 'sidebar--collapsed': isToggle }">
-    <div class="sidebar_bg">
-      <div class="sidebar__menu">
-        <template v-for="(item, index) in listItemSidebar" :key="index">
-          <div
-            class="sidebar__menu__item"
-            :class="{ 'sidebar__menu__item--active': isActive === index }"
-            @click="toggleActive(index)"
-          >
-            <MsIcon
-              v-if="isActive === index"
-              :x="item.icon.x"
-              :y="item.icon.y"
-              color="#2979ff"
-              :size="item.icon.size || 24"
-              :webkitMaskImage="getIconUrl(item.icon.url)"
-            />
-            <MsIcon
-              v-else
-              :x="item.icon.x"
-              :y="item.icon.y"
-              color="#5c6a82"
-              :size="item.icon.size || 24"
-              :webkitMaskImage="getIconUrl(item.icon.url)"
-            />
-            <div class="sidebar__menu__item__text">{{ item.name }}</div>
-            <div
-              v-if="item.hasChildren"
-              class="sidebar__menu__item__chevron"
-            ></div>
-          </div>
-          <div v-if="item.hasDivider" class="sidebar__divider"></div>
-        </template>
-      </div>
+    <div class="sidebar__menu">
+      <template v-for="(item, index) in listItemSidebar" :key="index">
+        <div
+          class="sidebar__menu__item"
+          :class="{ 'sidebar__menu__item--active': isActive === index }"
+          @click="toggleActive(index)"
+        >
+          <!--Icon active -->
+          <MsIcon
+            v-if="isActive === index"
+            :x="item.icon.x"
+            :y="item.icon.y"
+            color="#2979ff"
+            :size="item.icon.size || 20"
+            :webkitMaskImage="getIconUrl(item.icon.url)"
+            :isImage="item.icon.isImage"
+            class="sidebar__menu__item__icon"
+          />
+          <!--Icon inactive -->
+          <MsIcon
+            v-else
+            :x="item.icon.x"
+            :y="item.icon.y"
+            color="#5c6a82"
+            :size="item.icon.size || 20"
+            :webkitMaskImage="getIconUrl(item.icon.url)"
+            :isImage="item.icon.isImage"
+            class="sidebar__menu__item__icon"
+          />
+          <div class="sidebar__menu__item__text">{{ item.name }}</div>
+          <MsIcon
+            v-if="item.hasChildren"
+            :x="0"
+            :y="0"
+            :color="isActive === index ? '#2979ff' : '#717680'"
+            :size="16"
+            :webkitMaskImage="icons.chevon_down"
+            class="sidebar__menu__item__chevron"
+          />
+        </div>
+        <div v-if="item.hasDivider" class="sidebar__divider"></div>
+      </template>
     </div>
 
     <!-- Toggle button: góc dưới bên phải sidebar -->
@@ -40,9 +49,10 @@
       <MsIcon
         :webkitMaskImage="icons.sidebar.swap"
         :x="0"
-        :y="0"
+        :y="4"
         :size="20"
         color="#1f1f1f"
+        class="sidebar__toggle-btn__icon"
       />
     </button>
   </div>
@@ -52,7 +62,6 @@
 import { ref, inject } from "vue";
 import MsIcon from "./ms-icon/MsIcon.vue";
 import { listSidebar } from "../assets/data/sidebar";
-
 const icons = inject("icons");
 const isActive = ref(5);
 const isToggle = ref(false);
@@ -104,22 +113,12 @@ $transition-speed: 0.25s;
   bottom: 0;
   width: $sidebar-width;
   color: black;
-  background-size: cover;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   transition: width $transition-speed ease;
-
-  .sidebar_bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    padding: 16px 0;
-    background: #fff;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+  box-sizing: border-box;
 
   &__toggle-btn {
     position: absolute;
@@ -145,26 +144,30 @@ $transition-speed: 0.25s;
       display: flex;
       align-items: center;
       justify-content: center;
-      transform-origin: center center;
+      // Dùng translate thay vì transform-origin để xoay tại chỗ, không lệch
       transition: transform $transition-speed ease;
+      flex-shrink: 0;
     }
   }
 
   &__menu {
     flex: 1;
     overflow-y: auto;
+    margin-top: 16px;
 
     &::-webkit-scrollbar {
       display: none;
     }
 
     &__item {
-      height: 38px;
+      width: 168px;
+      height: 32px;
+      margin: 0 16px 8px;
       display: flex;
       align-items: center;
       border-radius: 4px;
-      padding: 0 12px;
-      margin: 0 8px 4px 8px;
+      padding: 6px 12px 6px 6px;
+      box-sizing: border-box;
       cursor: pointer;
       transition: all $transition-speed ease;
 
@@ -179,6 +182,11 @@ $transition-speed: 0.25s;
           color: #2979ff !important;
           font-weight: 700;
         }
+      }
+
+      // Icon luôn giữ nguyên kích thước, không bị margin hay translate lệch
+      &__icon {
+        flex-shrink: 0;
       }
 
       &__text {
@@ -197,13 +205,7 @@ $transition-speed: 0.25s;
       }
 
       &__chevron {
-        width: 6px;
-        height: 6px;
-        border-right: 2px solid #5c6a82;
-        border-bottom: 2px solid #5c6a82;
-        transform: rotate(45deg);
         margin-left: auto;
-        margin-right: 8px;
         opacity: 1;
         transition: opacity $transition-speed ease;
       }
@@ -213,28 +215,26 @@ $transition-speed: 0.25s;
   &__divider {
     height: 1px;
     background-color: #e5e8ec;
-    margin: 4px 12px 16px 12px;
+    margin: 4px 16px 12px 16px;
   }
 
   &--collapsed {
     width: $sidebar-collapsed-width;
 
     .sidebar__menu__item {
+      width: 32px !important;
+
       &__text {
-        opacity: 0;
-        max-width: 0;
-        margin-left: 0;
+        display: none !important;
       }
 
       &__chevron {
-        opacity: 0;
+        display: none !important;
       }
     }
 
-    .sidebar__divider {
-      margin: 4px 8px 16px 8px;
-    }
 
+    // Khi xoay 180 độ, icon vẫn căn giữa vì button dùng flexbox center
     .sidebar__toggle-btn__icon {
       transform: rotate(180deg);
     }

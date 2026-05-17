@@ -63,6 +63,7 @@ export const listSidebar = [
       url: "Icon gift.svg",
       x: 0,
       y: 0,
+      size: 24,
     },
   },
   {
@@ -87,6 +88,7 @@ export const listSidebar = [
   {
     name: "Kê khai thuế",
     path: "/tax",
+    hasDivider: true,
     icon: {
       url: "Icon receipt-tax.svg",
       x: 0,
@@ -101,6 +103,8 @@ export const listSidebar = [
       url: "logo.svg",
       x: 0,
       y: 0,
+      isImage: true,
+      IsImage: true,
     },
   },
   {
@@ -136,6 +140,7 @@ export const listSidebar = [
       url: "Lending.svg",
       x: 0,
       y: 0,
+      isImage: true,
     },
   },
   {
@@ -145,6 +150,7 @@ export const listSidebar = [
       url: "vertical_item.svg",
       x: 0,
       y: 0,
+      isImage: true,
     },
   },
   {
@@ -154,6 +160,7 @@ export const listSidebar = [
       url: "logo_CUKCUk.svg",
       x: 0,
       y: 0,
+      isImage: true,
     },
   },
 ];

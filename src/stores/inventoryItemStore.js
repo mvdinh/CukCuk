@@ -32,14 +32,19 @@ export const useInventoryItemStore = defineStore('inventoryItem', {
           delete payload.kitchenIDs;
         }
 
-        // Convert servingPreferences to additions array of objects
+        // Convert servingPreferences to additions array of objects (defensive mapping for additions/addtions)
         if (data.servingPreferences) {
-          payload.additions = data.servingPreferences
+          const mappedAdditions = data.servingPreferences
             .filter(pref => pref.preferenceID)
             .map(pref => ({
               inventoryItemAdditionID: pref.preferenceID,
-              extraPrice: pref.price || 0
+              additionID: pref.preferenceID,
+              extraPrice: pref.price || 0,
+              price: pref.price || 0
             }));
+          
+          payload.additions = mappedAdditions;
+          payload.addtions = mappedAdditions; // Defensive copy in case of backend typo
           delete payload.servingPreferences;
         }
 

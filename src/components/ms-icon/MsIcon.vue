@@ -13,8 +13,14 @@ import { computed } from "vue";
 const props = defineProps({
   name: String,
 
-  x: Number,
-  y: Number,
+  x: {
+    type: Number,
+    default: 0,
+  },
+  y: {
+    type: Number,
+    default: 0,
+  },
 
   size: {
     type: Number,
