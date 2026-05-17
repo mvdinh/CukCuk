@@ -83,8 +83,9 @@
           v-model="item.inventoryItemTypeID"
           label="Loại thực đơn"
           :options="typeOptions"
+          class="price-input"
         />
-        <label class="checkbox-label">
+        <label class="checkbox-label special-checkbox">
           <input type="checkbox" v-model="item.isSpecial" />
           <span>Là món đặc trưng</span>
         </label>
@@ -126,22 +127,24 @@
           ref="inputSalePrice"
           @blur="validateField('salePrice')"
         />
-        <label class="checkbox-label">
-          <input
-            type="checkbox"
-            :checked="item.marketPriceStatus === 0"
-            @change="item.marketPriceStatus = $event.target.checked ? 0 : null"
-          />
-          Thay đổi theo thời giá
-        </label>
-        <label class="checkbox-label">
-          <input
-            type="checkbox"
-            :checked="item.marketPriceStatus === 1"
-            @change="item.marketPriceStatus = $event.target.checked ? 1 : null"
-          />
-          Điều chỉnh giá tự do
-        </label>
+        <div class="price-checkboxes">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              :checked="item.marketPriceStatus === 0"
+              @change="item.marketPriceStatus = $event.target.checked ? 0 : null"
+            />
+            Thay đổi theo thời giá
+          </label>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              :checked="item.marketPriceStatus === 1"
+              @change="item.marketPriceStatus = $event.target.checked ? 1 : null"
+            />
+            Điều chỉnh giá tự do
+          </label>
+        </div>
       </div>
 
       <div class="field-row multi-col">

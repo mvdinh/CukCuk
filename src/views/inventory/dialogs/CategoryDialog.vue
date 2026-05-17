@@ -1,13 +1,13 @@
 <template>
   <div class="ms-dialog-overlay" v-if="modelValue">
     <div class="ms-dialog category-dialog">
-      <div class="ms-dialog__header ms-dialog__header--blue">
+      <div class="ms-dialog__header">
         <h3 class="ms-dialog__title">Thêm Nhóm thực đơn</h3>
         <div class="ms-dialog__close" @click="close">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
               d="M18 6L6 18M6 6L18 18"
-              stroke="#fff"
+              stroke="#666"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -20,7 +20,7 @@
         <!-- Mã nhóm -->
         <div class="dialog-field-row">
           <label class="dialog-label"
-            >Mã nhóm <span class="required">(*)</span></label
+            >Mã nhóm <span class="required">*</span></label
           >
           <div class="dialog-control">
             <MsInput
@@ -28,6 +28,7 @@
               :error="errors.categoryCode"
               :showAllErrors="showAllErrors"
               @blur="validateField('categoryCode')"
+              @update:modelValue="validateField('categoryCode')"
             />
           </div>
         </div>
@@ -35,7 +36,7 @@
         <!-- Tên nhóm -->
         <div class="dialog-field-row">
           <label class="dialog-label"
-            >Tên nhóm <span class="required">(*)</span></label
+            >Tên nhóm <span class="required">*</span></label
           >
           <div class="dialog-control">
             <MsInput
@@ -43,46 +44,15 @@
               :error="errors.categoryName"
               :showAllErrors="showAllErrors"
               @blur="validateField('categoryName')"
+              @update:modelValue="validateField('categoryName')"
             />
-          </div>
-        </div>
-
-        <!-- Tiếng Anh -->
-        <div class="dialog-field-row">
-          <label class="dialog-label">Tên nhóm Tiếng Anh</label>
-          <div class="dialog-control">
-            <MsInput v-model="formData.nameEn" />
-          </div>
-        </div>
-
-        <!-- Tiếng Hàn -->
-        <div class="dialog-field-row">
-          <label class="dialog-label">Tên nhóm Tiếng Hàn</label>
-          <div class="dialog-control">
-            <MsInput v-model="formData.nameKo" />
-          </div>
-        </div>
-
-        <!-- Tiếng Trung -->
-        <div class="dialog-field-row">
-          <label class="dialog-label">Tên nhóm Tiếng Trung</label>
-          <div class="dialog-control">
-            <MsInput v-model="formData.nameZh" />
-          </div>
-        </div>
-
-        <!-- Tiếng Nhật -->
-        <div class="dialog-field-row">
-          <label class="dialog-label">Tên nhóm Tiếng Nhật</label>
-          <div class="dialog-control">
-            <MsInput v-model="formData.nameJa" />
           </div>
         </div>
 
         <!-- Thuộc loại -->
         <div class="dialog-field-row">
           <label class="dialog-label"
-            >Thuộc loại <span class="required">(*)</span></label
+            >Thuộc loại <span class="required">*</span></label
           >
           <div class="dialog-control">
             <MsSelect
@@ -91,6 +61,7 @@
               :error="errors.type"
               :showAllErrors="showAllErrors"
               @blur="validateField('type')"
+              @update:modelValue="validateField('type')"
             />
           </div>
         </div>
@@ -98,13 +69,13 @@
         <!-- Chế biến tại -->
         <div class="dialog-field-row">
           <label class="dialog-label">Chế biến tại</label>
-          <div class="dialog-control flex-row">
+          <div class="dialog-control">
             <MsSelect
               v-model="formData.kitchenID"
               :options="kitchenOptions"
-              class="flex-1"
+              allowAdd
+              @add="openKitchenDialog"
             />
-            <button class="btn-icon-add" @click="openKitchenDialog">+</button>
           </div>
         </div>
 
@@ -115,43 +86,15 @@
             <textarea
               class="dialog-textarea"
               v-model="formData.description"
+              placeholder="Nhập diễn giải..."
             ></textarea>
           </div>
         </div>
       </div>
 
-      <div class="ms-dialog__footer split-footer">
-        <div class="footer-left">
-          <button class="btn btn-help">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              style="margin-right: 4px"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="#2680eb"
-                stroke-width="2"
-              />
-              <path
-                d="M12 16V16.01M12 8C12 8 15 8 15 11C15 13 12 14 12 14"
-                stroke="#2680eb"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            Giúp
-          </button>
-        </div>
-        <div class="footer-right">
-          <button class="btn btn-primary" @click="save">Cất</button>
-          <button class="btn btn-secondary" @click="close">Hủy bỏ</button>
-        </div>
+      <div class="ms-dialog__footer">
+        <MsButton type="secondary" @click="close">Hủy</MsButton>
+        <MsButton type="primary" @click="save">Lưu</MsButton>
       </div>
     </div>
 
@@ -164,6 +107,7 @@ import { defineComponent } from "vue";
 import MsInput from "../../../components/common/ms-input/MsInput.vue";
 import MsSelect from "../../../components/common/ms-select/MsSelect.vue";
 import KitchenDialog from "./KitchenDialog.vue";
+import MsButton from "../../../components/common/ms-button/MsButton.vue";
 import { useCategoryStore } from "../../../stores/categoryStore";
 import { useKitchenStore } from "../../../stores/kitchenStore";
 import { useTypeStore } from "../../../stores/typeStore";
@@ -177,6 +121,7 @@ export default defineComponent({
     MsInput,
     MsSelect,
     KitchenDialog,
+    MsButton,
   },
 
   extends: BaseDialog,
@@ -220,7 +165,7 @@ export default defineComponent({
      */
     async resetForm() {
       this.formData = {
-        categoryCode: `CAT-${Date.now()}`,
+        categoryCode: "",
         categoryName: "",
         nameEn: "",
         nameKo: "",
@@ -312,31 +257,27 @@ export default defineComponent({
 
 .ms-dialog {
   background: #fff;
-  border-radius: 4px;
-  width: 550px;
-  max-width: 95vw;
+  border-radius: 8px;
+  width: 500px;
+  max-width: 90vw;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .ms-dialog__header {
-  height: 48px;
-  padding: 0 16px;
+  height: 56px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  &--blue {
-    background-color: #2680eb;
-    color: #fff;
-  }
+  border-bottom: 1px solid #e0e0e0;
 
   .ms-dialog__title {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     margin: 0;
-    color: inherit;
+    color: #1f1f1f;
   }
 
   .ms-dialog__close {
@@ -345,20 +286,20 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: #f0f0f0;
     }
   }
 }
 
 .ms-dialog__content {
-  padding: 16px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .dialog-field-row {
@@ -371,7 +312,7 @@ export default defineComponent({
   }
 
   .dialog-label {
-    width: 150px;
+    width: 120px;
     font-size: 13px;
     color: #333;
     flex-shrink: 0;
@@ -386,7 +327,7 @@ export default defineComponent({
 
     .dialog-textarea {
       width: 100%;
-      height: 60px;
+      height: 80px;
       border: 1px solid #d0d0d0;
       border-radius: 4px;
       padding: 8px 12px;
@@ -395,32 +336,7 @@ export default defineComponent({
       font-family: inherit;
 
       &:focus {
-        border-color: #2680eb;
-      }
-    }
-
-    &.flex-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-
-      .flex-1 {
-        flex: 1;
-      }
-
-      .btn-icon-add {
-        width: 36px;
-        height: 36px;
-        border: 1px solid #d0d0d0;
-        background: #fff;
-        border-radius: 4px;
-        font-size: 20px;
-        cursor: pointer;
-        color: #2680eb;
-
-        &:hover {
-          background: #f0f4ff;
-        }
+        border-color: #2b78ff;
       }
     }
   }
@@ -428,59 +344,18 @@ export default defineComponent({
 
 .ms-dialog__footer {
   height: 56px;
-  padding: 0 16px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
-  background: #f9f9f9;
+  justify-content: flex-end;
+  gap: 12px;
   border-top: 1px solid #e0e0e0;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
+  background: #f9f9f9;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 
-  &.split-footer {
-    justify-content: space-between;
-  }
-
-  .footer-right {
-    display: flex;
-    gap: 8px;
-  }
-
-  .btn {
-    height: 32px;
-    padding: 0 16px;
-    border-radius: 4px;
-    font-size: 13px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .btn-help {
-    background: transparent;
-    border: none;
-    color: #2680eb;
-    padding: 0;
-  }
-
-  .btn-secondary {
-    background: #fff;
-    border-color: #d0d0d0;
-    color: #333;
-
-    &:hover {
-      background: #f0f0f0;
-    }
-  }
-
-  .btn-primary {
-    background: #2680eb;
-    color: #fff;
-
-    &:hover {
-      background: #1a6bd4;
-    }
+  :deep(.ms-button) {
+    border-radius: 8px !important;
   }
 }
 </style>

@@ -95,7 +95,7 @@
     .ms-input,
     .ms-select {
       display: grid;
-      grid-template-columns: 180px 1fr;
+      grid-template-columns: 200px 1fr;
       align-items: center;
       row-gap: 4px;
 
@@ -118,8 +118,9 @@
       }
     }
 
-    .ms-input.price-input {
-      grid-template-columns: 180px 204px;
+    .ms-input.price-input,
+    .ms-select.price-input {
+      grid-template-columns: 200px 204px;
       width: fit-content;
       flex: 0 0 auto;
     }
@@ -135,6 +136,7 @@
         flex-direction: row;
         align-items: flex-end;
         gap: 16px;
+        position: relative;
 
         > * {
           flex: 1;
@@ -144,9 +146,25 @@
         }
       }
 
+      .special-checkbox {
+        position: absolute;
+        left: 420px;
+        bottom: 0;
+      }
+
+      .price-checkboxes {
+        position: absolute;
+        left: 420px;
+        bottom: 0;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        height: 32px;
+      }
+
       &:has(.ms-textarea) {
         display: grid;
-        grid-template-columns: 180px 1fr;
+        grid-template-columns: 200px 1fr;
         align-items: flex-start;
         height: auto;
       }
@@ -163,7 +181,7 @@
 
     .kitchen-select-wrapper {
       display: grid;
-      grid-template-columns: 180px 1fr;
+      grid-template-columns: 200px 1fr;
       align-items: center;
       row-gap: 4px;
 
@@ -179,14 +197,14 @@
         gap: 8px;
         align-items: center;
         border: 1px solid #e0e0e0;
-        padding: 4px 8px;
+        padding: 4px;
         border-radius: 4px;
         min-height: 36px;
         background: #fff;
 
         .kitchen-tag {
-          background: #e6f0ff;
-          color: #2680eb;
+          background: #f1f1f1;
+          color: #333;
           padding: 4px 8px;
           border-radius: 4px;
           font-size: 13px;
@@ -197,8 +215,10 @@
           .remove-tag {
             cursor: pointer;
             font-weight: bold;
+            color: #888;
+            margin-left: 2px;
             &:hover {
-              color: red;
+              color: #ff4d4d;
             }
           }
         }

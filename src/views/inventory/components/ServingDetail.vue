@@ -37,7 +37,7 @@
           <td>
             <MsSelectCustom
               v-model="pref.preferenceID"
-              :options="servingOptions"
+              :options="getAvailableOptions(index)"
               :valueField="'inventoryItemAdditionID'"
               :labelField="'additionName'"
               :priceField="'extraPrice'"
@@ -126,6 +126,16 @@ export default defineComponent({
       });
     };
 
+    const getAvailableOptions = (currentIndex) => {
+      const selectedInOthers = (formState.item.value?.servingPreferences || [])
+        .filter((pref, idx) => idx !== currentIndex && pref.preferenceID)
+        .map((pref) => pref.preferenceID);
+
+      return (formState.servingOptions.value || []).filter(
+        (opt) => !selectedInOthers.includes(opt.inventoryItemAdditionID)
+      );
+    };
+
     const handleAddServingRow = () => {
       if (!formState.item.value.servingPreferences) {
         formState.item.value.servingPreferences = [];
@@ -160,6 +170,7 @@ export default defineComponent({
       icons,
       servingPreferences,
       servingOptions: formState.servingOptions,
+      getAvailableOptions,
       showAddDialog,
       localSearchText,
       currentEditIndex,

@@ -14,7 +14,7 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Đơn vị tính <span class="required">*</span></label>
           <div class="dialog-control">
-            <MsInput v-model="formData.unitName" :error="errors.unitName" :showAllErrors="showAllErrors" :maxLength="25" @blur="validateField('unitName')" />
+            <MsInput v-model="formData.unitName" :error="errors.unitName" :showAllErrors="showAllErrors" :maxLength="25" @blur="validateField('unitName')" @update:modelValue="validateField('unitName')" />
           </div>
         </div>
         <div class="dialog-field-row align-start">
@@ -218,5 +218,9 @@ export default defineComponent({
   background: #f9f9f9;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+
+  :deep(.ms-button) {
+    border-radius: 8px !important;
+  }
 }
 </style>

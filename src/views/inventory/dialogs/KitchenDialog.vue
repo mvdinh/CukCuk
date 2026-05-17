@@ -2,7 +2,7 @@
   <div class="ms-dialog-overlay" v-if="modelValue">
     <div class="ms-dialog kitchen-dialog">
       <div class="ms-dialog__header">
-        <h3 class="ms-dialog__title">Thêm Bếp/Nơi pha chế</h3>
+        <h3 class="ms-dialog__title">Thêm Bếp</h3>
         <div class="ms-dialog__close" @click="close">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path d="M18 6L6 18M6 6L18 18" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -14,7 +14,7 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Tên <span class="required">*</span></label>
           <div class="dialog-control">
-            <MsInput v-model="formData.kitchenName" :error="errors.kitchenName" :showAllErrors="showAllErrors" :maxLength="25" @blur="validateField('kitchenName')" />
+            <MsInput v-model="formData.kitchenName" :error="errors.kitchenName" :showAllErrors="showAllErrors" :maxLength="25" @blur="validateField('kitchenName')" @update:modelValue="validateField('kitchenName')" />
           </div>
         </div>
         <div class="dialog-field-row align-start">
@@ -222,5 +222,9 @@ export default defineComponent({
   background: #f9f9f9;
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
+
+  :deep(.ms-button) {
+    border-radius: 8px !important;
+  }
 }
 </style>

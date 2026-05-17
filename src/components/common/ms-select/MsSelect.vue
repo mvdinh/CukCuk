@@ -40,14 +40,6 @@
 
         <!-- Icons at the end of the input -->
         <div class="select__icons">
-          <div class="select__arrow"></div>
-          <MsIcon
-            v-if="allowSearch"
-            :webkitMaskImage="icons.table.trash"
-            :size="16"
-            class="icon-action"
-            @click.stop="$emit('search')"
-          />
           <MsIcon
             v-if="allowAdd && iconsInside"
             :webkitMaskImage="icons.form.plus"
