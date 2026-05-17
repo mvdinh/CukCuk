@@ -20,7 +20,7 @@
         <MsButton
           type="primary"
           text="Thêm"
-          :icon="{ url: icons.header.plus, x: 0, y: 0, color: '#fff' }"
+          :icon="{ url: icons.header.plus, x: 2, y: 6, color: '#fff' }"
           @click="handleAdd"
         />
 

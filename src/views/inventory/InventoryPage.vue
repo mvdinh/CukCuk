@@ -30,6 +30,7 @@
                   :fields="tableColumns"
                   :hasCheckbox="false"
                   filterable
+                  :loading="loading"
                   @edit="handleEdit"
                   @delete="handleDelete"
                   @filter="handleFilter"
@@ -206,10 +207,16 @@ export default defineComponent({
           pageSize: proxy.pageSize,
         };
 
+        const startTime = Date.now();
         const res = await axios.post(`${props.api}/filter`, payload);
 
         proxy.store.data = res.data.listData ?? [];
         proxy.store.total = res.data.totalCount ?? 0;
+
+        const elapsedTime = Date.now() - startTime;
+        if (elapsedTime < 1000) {
+          await new Promise((resolve) => setTimeout(resolve, 1000 - elapsedTime));
+        }
       } catch (err) {
         console.error("loadData error:", err.response || err);
         toast.error("Không thể tải dữ liệu. Vui lòng thử lại!");

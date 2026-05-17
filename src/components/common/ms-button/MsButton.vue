@@ -11,6 +11,7 @@
       :x="icon.x"
       :y="icon.y"
       :color="icon.color"
+      :isImage="icon.isImage"
     />
 
     <span v-if="text" class="ms-button__text">{{ text }}</span>

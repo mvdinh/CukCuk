@@ -1,5 +1,10 @@
 <template>
   <div class="ms-table-container">
+    <!-- Loading Overlay -->
+    <div v-if="loading" class="table__loading-overlay">
+      <div class="loader-spinner"></div>
+      <span class="table__loading-text">Đang tải dữ liệu</span>
+    </div>
     <table
       id="table__user"
       :style="{ tableLayout: 'fixed', width: tableWidth + 'px' }"
@@ -13,7 +18,6 @@
             width: (colWidths[field.key] || field.width || 160) + 'px',
           }"
         />
-        <col style="width: 80px; min-width: 80px" />
       </colgroup>
 
       <thead v-if="hasChildren">
@@ -197,7 +201,7 @@
                   y: 0,
                   color: '#1f1f1f',
                 }"
-                @click="handleEdit"
+                @click="handleEdit(item)"
                 class="btn__action"
               />
               <MsButton
@@ -246,6 +250,7 @@ const props = defineProps({
   selected: { type: Array, default: () => [] },
   hasCheckbox: { type: Boolean, default: true },
   filterable: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(["edit", "delete", "update:selected", "filter"]);
@@ -323,7 +328,7 @@ const isLastPinned = (key) => {
 
 const tableWidth = computed(() => {
   const checkboxCol = props.hasCheckbox ? 48 : 0;
-  const actionCol = 80;
+  const actionCol = 0;
   const colsWidth = flatFields.value.reduce(
     (sum, f) => sum + (colWidths[f.key] || DEFAULT_WIDTH),
     0,
@@ -446,5 +451,40 @@ const toggleSelectAll = () => {
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+.ms-table-container {
+  position: relative;
+}
+.table__loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background-color: rgba(255, 255, 255, 0.75);
+  z-index: 100;
+}
+.loader-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #2680eb;
+  border-radius: 50%;
+  animation: loader-spin 1s linear infinite;
+}
+.table__loading-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+}
+@keyframes loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

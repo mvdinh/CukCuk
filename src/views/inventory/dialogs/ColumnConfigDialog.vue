@@ -4,40 +4,26 @@
       <div v-if="modelValue" class="dialog-overlay" @click.self="handleClose">
         <div class="dialog">
           <div class="dialog__header">
-            <h3 class="dialog__title">Thiết lập bảng</h3>
-            <button class="dialog__close" @click="handleClose">✕</button>
+            <div class="dialog__header__container">
+              <h3 class="dialog__title">Thiết lập bảng</h3>
+              <button class="dialog__close" @click="handleClose">
+                <MsIcon
+                  :size="12"
+                  :isImage="true"
+                  :webkitMaskImage="icons.table.close"
+                />
+              </button>
+            </div>
           </div>
 
           <div class="dialog__content">
             <div class="config-search">
-              <div class="search-wrapper">
-                <input
-                  type="text"
-                  v-model="searchText"
-                  placeholder="Tìm kiếm"
-                />
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  class="search-icon"
-                >
-                  <circle
-                    cx="11"
-                    cy="11"
-                    r="8"
-                    stroke="#999"
-                    stroke-width="2"
-                  />
-                  <path
-                    d="M21 21l-4.35-4.35"
-                    stroke="#999"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                  />
-                </svg>
-              </div>
+              <MsInput
+                v-model="searchText"
+                :isSearch="true"
+                placeholder="Tìm kiếm"
+                class="config-search-input"
+              />
             </div>
 
             <div class="column-table">
@@ -77,8 +63,7 @@
                 </div>
                 <div class="col-name">Tên cột</div>
                 <div class="col-width">Độ rộng cột</div>
-                <div class="col-pin">Ghim cột</div>
-                <div class="col-drag"></div>
+                <div class="col-last">Ghim cột</div>
               </div>
 
               <div class="column-table-body">
@@ -91,6 +76,7 @@
                     v-for="col in filteredColumns"
                     :key="col.key"
                     class="column-row"
+                    :class="{ 'row--active': col.visible }"
                   >
                     <div class="col-check">
                       <div
@@ -123,43 +109,30 @@
                         class="width-input"
                       />
                     </div>
-                    <div class="col-pin">
-                      <div
-                        class="pin-icon"
-                        :class="{ pinned: col.fixed }"
-                        @click="col.fixed = !col.fixed"
-                      >
-                        <svg
-                          width="18"
-                          height="18"
-                          viewBox="0 0 24 24"
-                          fill="none"
+                    <div class="col-last">
+                      <div class="col-last-actions">
+                        <div
+                          class="pin-icon"
+                          :class="{ pinned: col.fixed }"
+                          @click="col.fixed = !col.fixed"
                         >
-                          <path
-                            d="M12 2v8m0 0l4 4m-4-4l-4 4m4 6v-2"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
+                          <MsIcon
+                            :size="16"
+                            :isImage="true"
+                            :webkitMaskImage="
+                              col.fixed ? icons.filter.ghim : icons.filter.unpin
+                            "
+                            :color="col.fixed ? '#2680eb' : '#2680eb'"
                           />
-                        </svg>
-                      </div>
-                    </div>
-                    <div class="col-drag">
-                      <div class="drag-handle">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <circle cx="9" cy="6" r="1.5" fill="#ccc" />
-                          <circle cx="15" cy="6" r="1.5" fill="#ccc" />
-                          <circle cx="9" cy="12" r="1.5" fill="#ccc" />
-                          <circle cx="15" cy="12" r="1.5" fill="#ccc" />
-                          <circle cx="9" cy="18" r="1.5" fill="#ccc" />
-                          <circle cx="15" cy="18" r="1.5" fill="#ccc" />
-                        </svg>
+                        </div>
+                        <div class="drag-handle">
+                          <MsIcon
+                            :size="16"
+                            :isImage="true"
+                            :webkitMaskImage="icons.filter.grip_vertical"
+                            color="#a6a6a6"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -169,12 +142,25 @@
           </div>
 
           <div class="dialog__footer">
-            <button class="btn btn--secondary" @click="handleReset">
-              Lấy lại mặc định
-            </button>
+            <MsButton
+              type="secondary"
+              text="Lấy lại mặc định"
+              class="btn-reset"
+              @click="handleReset"
+            />
             <div class="footer-right">
-              <button class="btn btn--white" @click="handleClose">Hủy</button>
-              <button class="btn btn--primary" @click="handleApply">Lưu</button>
+              <MsButton
+                type="secondary"
+                text="Hủy"
+                class="btn-cancel"
+                @click="handleClose"
+              />
+              <MsButton
+                type="primary"
+                text="Lưu"
+                class="btn-save"
+                @click="handleApply"
+              />
             </div>
           </div>
         </div>
@@ -182,10 +168,14 @@
     </Transition>
   </Teleport>
 </template>
-
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, inject } from "vue";
 import { VueDraggableNext } from "vue-draggable-next";
+import MsIcon from "../../../components/common/ms-icon/MsIcon.vue";
+import MsButton from "../../../components/common/ms-button/MsButton.vue";
+import MsInput from "../../../components/common/ms-input/MsInput.vue";
+
+const icons = inject("icons");
 
 const props = defineProps({
   modelValue: {
@@ -252,8 +242,7 @@ const handleClose = () => {
 };
 </script>
 
-<style scoped>
-/* ====== Overlay & Dialog ====== */
+<style lang="scss" scoped>
 /* ====== Overlay & Dialog ====== */
 .dialog-overlay {
   position: fixed;
@@ -268,7 +257,7 @@ const handleClose = () => {
 
 .dialog {
   background: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 648px;
   height: 520px;
   max-width: 95vw;
@@ -276,60 +265,70 @@ const handleClose = () => {
   display: flex;
   flex-direction: column;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-}
 
-.dialog__header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 600px;
-  height: 68px;
-  height: 28px;
-  padding: 20px;
-  .dialog__title {
-    width: 560px;
-    height: 28px;
-    font-size: 16px;
+  &__header {
+    padding: 24px 24px 16px;
+    display: flex;
+    justify-content: center;
+
+    &__container {
+      width: 600px;
+      height: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  &__title {
+    font-size: 18px;
     font-weight: 700;
     margin: 0;
+    color: #1f1f1f;
+    line-height: 22px;
   }
-  .dialog__close {
+
+  &__close {
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 20px;
-    color: #666;
-    gap: 8pxs;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+  }
+
+  &__content {
+    padding: 0 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    overflow: hidden;
   }
 }
 
-.dialog__content {
-  padding: 0 24px 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex: 1;
-  overflow: hidden;
-}
-
 .config-search {
-  .search-wrapper {
-    position: relative;
-    input {
-      width: 100%;
-      height: 36px;
-      padding: 0 12px 0 36px;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      outline: none;
-      &:focus {
-        border-color: #2680eb;
-      }
-    }
-    .search-icon {
-      position: absolute;
-      left: 10px;
-      top: 10px;
+  width: 240px;
+  height: 32px;
+
+  :deep(.ms-input) {
+    width: 240px !important;
+    height: 32px !important;
+  }
+
+  :deep(.ms-input__field) {
+    width: 240px !important;
+    height: 32px !important;
+    font-size: 13px !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+    
+    &:focus {
+      border-color: #2680eb !important;
     }
   }
 }
@@ -346,11 +345,19 @@ const handleClose = () => {
 .column-table-header {
   display: flex;
   background: #f4f5f8;
-  font-weight: 600;
+  font-weight: 700;
   border-bottom: 1px solid #e0e0e0;
+  height: 32px;
+  align-items: center;
   div {
-    padding: 10px 12px;
-    border-right: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #1f1f1f;
+  }
+  
+  .col-last {
+    justify-content: flex-start;
   }
 }
 
@@ -363,128 +370,163 @@ const handleClose = () => {
   display: flex;
   border-bottom: 1px solid #e0e0e0;
   align-items: center;
+  height: 32px;
+  background: #ffffff;
   &:hover {
     background: #f9fafb;
   }
+  &.row--active {
+    background: #f0f6fe;
+  }
   div {
-    padding: 8px 12px;
-    border-right: 1px solid #e0e0e0;
+
     display: flex;
     align-items: center;
   }
 }
 
 .col-check {
-  width: 50px;
+  width: 40px;
   justify-content: center;
+  padding: 0 !important;
+  box-sizing: border-box;
 }
 .col-name {
-  flex: 1;
+  width: 355px;
+  flex: none;
+  padding: 0 12px !important;
+  font-size: 13px;
+  color: #1f1f1f;
+  box-sizing: border-box;
 }
 .col-width {
-  width: 140px;
+  width: 108px;
+  justify-content: flex-end;
+  padding: 0 12px !important;
+  box-sizing: border-box;
 }
-.col-pin {
-  width: 80px;
+.col-last {
+  width: 89px;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  padding: 0 12px !important;
+  box-sizing: border-box;
 }
-.col-drag {
-  width: 50px;
-  justify-content: center;
-  border-right: none !important;
+.col-last-actions {
+  width: 57px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .custom-checkbox {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border: 1px solid #ccc;
   border-radius: 3px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.2s;
+  
   &.checked-all {
     background: #2680eb;
     border-color: #2680eb;
   }
+  
   &.checked-some {
-    background: #fff;
+    background: #2680eb;
     border-color: #2680eb;
     .minus {
       width: 10px;
       height: 2px;
-      background: #2680eb;
+      background: #ffffff;
     }
   }
 }
 
 .width-input {
-  width: 100%;
-  height: 32px;
+  width: 100% !important;
+  height: 28px;
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  padding: 0 8px;
+  border-radius: 8px;
+  padding: 0 12px;
   text-align: right;
+  background: #ffffff;
+  box-sizing: border-box;
+  font-size: 13px;
+  color: #1f1f1f;
+  transition: border-color 0.2s;
+
   &:focus {
     border-color: #2680eb;
     outline: none;
+  }
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
 
 .pin-icon {
   cursor: pointer;
-  color: #ccc;
-  &.pinned {
-    color: #2680eb;
-  }
+  opacity: 0.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+
   &:hover {
     opacity: 0.8;
+  }
+
+  &.pinned {
+    opacity: 1;
   }
 }
 
 .drag-handle {
   cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dialog__footer {
+  height: 64px;
+  box-sizing: border-box;
   padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: #f4f5f8;
   border-top: 1px solid #e0e0e0;
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-}
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 
-.footer-right {
-  display: flex;
-  gap: 8px;
-}
+  :deep(.ms-button) {
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+  }
 
-.btn {
-  height: 36px;
-  padding: 0 16px;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid transparent;
-  &--primary {
-    background: #2680eb;
-    color: #fff;
+  .btn-reset {
+    width: 124px !important;
   }
-  &--secondary {
-    background: #fff;
-    border-color: #e0e0e0;
-    color: #333;
-  }
-  &--white {
-    background: #fff;
-    border-color: transparent;
-    color: #333;
-  }
-  &:hover {
-    opacity: 0.9;
+
+  .footer-right {
+    display: flex;
+    gap: 8px;
+
+    .btn-cancel,
+    .btn-save {
+      width: 80px !important;
+    }
   }
 }
 

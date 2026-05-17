@@ -49,10 +49,11 @@
         <MsButton
           type="secondary"
           :icon="{
-            url: icons.toolbar.filter,
+            url: filterStore.showAdvancedFilter ? icons.table.filter_filled : icons.toolbar.filter,
             x: 0,
             y: 0,
             color: '#1f1f1f',
+            isImage: filterStore.showAdvancedFilter ? true : false,
           }"
           class="table-toolbar__button"
           @click="filterStore.toggleAdvancedFilter()"

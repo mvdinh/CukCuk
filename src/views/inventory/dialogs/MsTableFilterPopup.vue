@@ -175,16 +175,22 @@ const clearAll = () => {
     cursor: pointer;
     color: #999;
     font-size: 16px;
-    margin-right: 8px;
   }
 }
 .filter__body {
   flex: 1;
   overflow-y: auto;
+  scrollbar-gutter: stable;
   padding: 0 12px 12px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+.search-box {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-left: 8px;
 }
 .filter-list {
   display: flex;
@@ -194,6 +200,7 @@ const clearAll = () => {
 .filter-item {
   display: flex;
   flex-direction: column;
+  width: 216px;
   gap: 8px;
   padding: 4px 8px;
   border-radius: 8px;
@@ -232,7 +239,7 @@ const clearAll = () => {
 .filter-item-controls {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
 }
 .filter__footer {
