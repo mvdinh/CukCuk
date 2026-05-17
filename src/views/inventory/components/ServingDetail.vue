@@ -49,13 +49,12 @@
             />
           </td>
 
-          <!-- Cột 2: hiển thị giá tiền (chỉ đọc) -->
+          <!-- Cột 2: Thu thêm -->
           <td class="price-display-cell">
-            {{
-              pref.price != null
-                ? Number(pref.price).toLocaleString("vi-VN")
-                : 0
-            }}
+            <MsCurrencyInput
+              v-model="pref.price"
+              placeholder="0"
+            />
           </td>
 
           <!-- Cột 3: xóa dòng -->
@@ -87,6 +86,7 @@ import MsInput from "../../../components/common/ms-input/MsInput.vue";
 import MsIcon from "../../../components/common/ms-icon/MsIcon.vue";
 import ServingDialog from "../dialogs/ServingDialog.vue";
 import MsSelectCustom from "../../../components/common/ms-select/MsSelectCustom.vue";
+import MsCurrencyInput from "../../../components/common/ms-currency-input/MsCurrencyInput.vue";
 
 export default defineComponent({
   name: "ServingDetail",
@@ -95,6 +95,7 @@ export default defineComponent({
     MsIcon,
     ServingDialog,
     MsSelectCustom,
+    MsCurrencyInput,
   },
 
   setup() {
@@ -193,6 +194,11 @@ export default defineComponent({
   font-size: 13.5px;
   color: #1f2937;
   font-weight: 500;
+
+  :deep(.ms-currency-input) {
+    width: 100%;
+    max-width: 200px;
+  }
 }
 
 .price-header-cell {

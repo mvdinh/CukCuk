@@ -93,20 +93,23 @@
     gap: 10px;
 
     .ms-input,
-    .ms-select {
+    .ms-select,
+    .ms-currency-input {
       display: grid;
       grid-template-columns: 200px 1fr;
       align-items: center;
       row-gap: 4px;
 
       .ms-input__label,
-      .ms-select__label {
+      .ms-select__label,
+      .ms-currency-input__label {
         grid-column: 1 / 2;
         grid-row: 1 / 2;
         margin: 0;
       }
       .ms-input__wrapper,
-      .ms-select__group {
+      .ms-select__group,
+      .ms-currency-input__wrapper {
         grid-column: 2 / 3;
         grid-row: 1 / 2;
       }
@@ -119,7 +122,8 @@
     }
 
     .ms-input.price-input,
-    .ms-select.price-input {
+    .ms-select.price-input,
+    .ms-currency-input.price-input {
       grid-template-columns: 200px 204px;
       width: fit-content;
       flex: 0 0 auto;

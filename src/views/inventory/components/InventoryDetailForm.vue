@@ -116,16 +116,15 @@
       </div>
 
       <div class="field-row multi-col">
-        <MsInput
-          type="number"
+        <MsCurrencyInput
           v-model="item.salePrice"
           labelFor="Giá bán"
           required
           class="price-input"
           :error="errors.salePrice"
-          :showAllErrors="showAllErrors"
           ref="inputSalePrice"
           @blur="validateField('salePrice')"
+          @update:modelValue="validateField('salePrice')"
         />
         <div class="price-checkboxes">
           <label class="checkbox-label">
@@ -148,14 +147,13 @@
       </div>
 
       <div class="field-row multi-col">
-        <MsInput
-          type="number"
+        <MsCurrencyInput
           v-model="item.costPrice"
           labelFor="Giá vốn"
           class="price-input"
           :error="errors.costPrice"
-          :showAllErrors="showAllErrors"
           @blur="validateField('costPrice')"
+          @update:modelValue="validateField('costPrice')"
         />
       </div>
 
@@ -202,7 +200,7 @@ import { defineComponent, inject } from "vue";
 import MsInput from "../../../components/common/ms-input/MsInput.vue";
 import MsSelect from "../../../components/common/ms-select/MsSelect.vue";
 import MsButton from "../../../components/common/ms-button/MsButton.vue";
-const icons = inject("icons");
+import MsCurrencyInput from "../../../components/common/ms-currency-input/MsCurrencyInput.vue";
 
 export default defineComponent({
   name: "InventoryDetailForm",
@@ -210,6 +208,7 @@ export default defineComponent({
     MsButton,
     MsInput,
     MsSelect,
+    MsCurrencyInput,
   },
   setup() {
     const icons = inject("icons");

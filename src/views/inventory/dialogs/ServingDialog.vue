@@ -20,7 +20,7 @@
         <div class="dialog-field-row">
           <label class="dialog-label">Thu thêm</label>
           <div class="dialog-control">
-            <MsInput type="number" v-model="formData.price" />
+            <MsCurrencyInput v-model="formData.price" />
           </div>
         </div>
         <div class="dialog-field-row align-start">
@@ -43,6 +43,7 @@
 import { defineComponent } from "vue";
 import MsInput from "../../../components/common/ms-input/MsInput.vue";
 import MsButton from "../../../components/common/ms-button/MsButton.vue";
+import MsCurrencyInput from "../../../components/common/ms-currency-input/MsCurrencyInput.vue";
 import { useServingStore } from "../../../stores/servingStore";
 import { toast } from "../../../utils/toast";
 import BaseDialog from "../../../base/BaseDialog";
@@ -53,6 +54,7 @@ export default defineComponent({
   components: {
     MsInput,
     MsButton,
+    MsCurrencyInput,
   },
 
   extends: BaseDialog,
