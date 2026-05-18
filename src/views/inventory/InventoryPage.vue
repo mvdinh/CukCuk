@@ -66,7 +66,7 @@ import {
 } from "vue";
 import axios from "axios";
 import { useRouter, useRoute } from "vue-router";
-import * as XLSX from "xlsx";
+import { exportToExcel } from "../../utils/excelExporter";
 
 import MsTable from "../../components/common/ms-table/MsTable.vue";
 import MsPagination from "../../components/common/ms-pagination/MsPagination.vue";
@@ -122,30 +122,13 @@ export default defineComponent({
           return;
         }
 
-        // 1. Chuẩn bị dữ liệu để xuất dựa trên các cột đang hiển thị
-        const dataToExport = proxy.store.data.map((row) => {
-          const exportRow = {};
-          tableColumns.value.forEach((col) => {
-            if (col.key) {
-              let value = row[col.key];
-              // Format dữ liệu cho các trường đặc biệt nếu cần
-              if (col.type === "checkbox" || typeof value === "boolean") {
-                value = value ? "Có" : "Không";
-              }
-              // Sử dụng label của cột làm tiêu đề trong Excel
-              exportRow[col.label] = value;
-            }
-          });
-          return exportRow;
+        exportToExcel({
+          data: proxy.store.data,
+          columns: tableColumns.value,
+          title: "Danh sách thực đơn",
+          fileName: "Danh_sach_thuc_don",
+          sheetName: "Thực đơn",
         });
-
-        // 2. Tạo workbook và worksheet
-        const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Thực đơn");
-
-        // 3. Xuất file ngay tại client
-        XLSX.writeFile(workbook, `Danh_sach_thuc_don_${Date.now()}.xlsx`);
 
         toast.success("Xuất file Excel thành công!");
       } catch (err) {

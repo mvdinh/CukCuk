@@ -32,7 +32,7 @@ const handleSaveAndAdd = () => emit("handleSave", true);
 
 <style lang="scss" scoped>
 .inventory-form__footer {
-  height: 56px;
+  height: 48px;
   padding: 0 20px;
   border-top: 1px solid #e0e0e0;
   display: flex;

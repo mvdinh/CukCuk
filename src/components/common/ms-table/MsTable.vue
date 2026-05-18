@@ -179,7 +179,7 @@
             <template v-if="field.type === 'checkbox'">
               <div class="checkbox-icon-wrapper">
                 <MsIcon
-                  v-if="item[field.key]"
+                  v-if="isCheckboxChecked(item, field)"
                   :size="16"
                   :isImage="true"
                   :webkitMaskImage="icons.table.check"
@@ -218,7 +218,7 @@
               <MsButton
                 type="secondary"
                 :icon="{ url: icons.table.trash, x: 0, y: 0, color: 'red' }"
-                @click="handleDelete"
+                @click="handleDelete(item)"
                 class="btn__action"
               />
             </div>
@@ -374,6 +374,17 @@ onBeforeUnmount(() => {
 });
 
 // ─── Render ──────────────────────────────────────────────────────────────────
+
+const isCheckboxChecked = (item, field) => {
+  const value = item[field.key];
+  if (field.key === "marketPriceStatus") {
+    return value === 1;
+  }
+  if (field.key === "priceConfigType") {
+    return value || item.marketPriceStatus === 0;
+  }
+  return !!value;
+};
 
 const getInitial = (name) => {
   if (!name?.trim()) return "A";

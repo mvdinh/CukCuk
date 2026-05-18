@@ -24,18 +24,6 @@ const fieldMenu = [
     type: "checkbox",
     align: "center",
   },
-  {
-    key: "menuDisplayStatus",
-    label: "Hiển thị trên thực đơn",
-    type: "checkbox",
-    align: "center",
-  },
-  {
-    key: "sellingStatus",
-    label: "Ngừng bán",
-    type: "checkbox",
-    align: "center",
-  },
 ];
 
 export default fieldMenu;

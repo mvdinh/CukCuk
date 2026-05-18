@@ -87,6 +87,7 @@ import MsIcon from "../../../components/common/ms-icon/MsIcon.vue";
 import ServingDialog from "../dialogs/ServingDialog.vue";
 import MsSelectCustom from "../../../components/common/ms-select/MsSelectCustom.vue";
 import MsCurrencyInput from "../../../components/common/ms-currency-input/MsCurrencyInput.vue";
+import { confirmDialog } from "../../../utils/confirm";
 
 export default defineComponent({
   name: "ServingDetail",
@@ -147,8 +148,32 @@ export default defineComponent({
       });
     };
 
-    const removeServingRow = (index) => {
-      formState.item.value.servingPreferences.splice(index, 1);
+    const removeServingRow = async (index) => {
+      const pref = formState.item.value.servingPreferences[index];
+      let additionName = "";
+      if (pref && pref.preferenceID) {
+        const option = formState.servingOptions.value?.find(
+          (o) => o.inventoryItemAdditionID === pref.preferenceID
+        );
+        if (option) {
+          additionName = option.additionName;
+        }
+      }
+
+      const message = additionName
+        ? `Bạn có chắc chắn muốn xóa sở thích phục vụ "${additionName}" khỏi danh sách không?`
+        : "Bạn có chắc chắn muốn xóa dòng sở thích phục vụ này không?";
+
+      const confirmed = await confirmDialog(message, {
+        title: "Xóa sở thích phục vụ",
+        type: "danger",
+        confirmText: "Xóa",
+        cancelText: "Hủy",
+      });
+
+      if (confirmed) {
+        formState.item.value.servingPreferences.splice(index, 1);
+      }
     };
 
     const openAddDialog = (index) => {

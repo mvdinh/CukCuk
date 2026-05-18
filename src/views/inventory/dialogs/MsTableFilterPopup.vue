@@ -24,8 +24,8 @@
               'filter-item--active': filterStore.columnFilters[col.key].active,
             }"
           >
-            <!-- Header for non-checkbox types -->
-            <div v-if="col.type !== 'checkbox'" class="filter-item-header">
+            <!-- Header for ALL types -->
+            <div class="filter-item-header">
               <label class="checkbox-wrapper">
                 <input
                   type="checkbox"
@@ -35,36 +35,44 @@
               </label>
             </div>
 
-            <!-- Controls for non-checkbox types -->
+            <!-- Controls (if filter is active) -->
             <div
-              v-if="
-                col.type !== 'checkbox' &&
-                filterStore.columnFilters[col.key].active
-              "
+              v-if="filterStore.columnFilters[col.key].active"
               class="filter-item-controls"
             >
-              <MsSelect
-                v-model="filterStore.columnFilters[col.key].operator"
-                :options="getOperatorOptions(col.type)"
-              />
-              <MsInput
-                v-model="filterStore.columnFilters[col.key].value"
-                placeholder="Giá trị"
-              />
-            </div>
-
-            <!-- Single checkbox for checkbox types -->
-            <div v-if="col.type === 'checkbox'" class="filter-item-header">
-              <label class="checkbox-wrapper">
-                <input
-                  type="checkbox"
-                  :checked="filterStore.columnFilters[col.key].active"
-                  @change="
-                    onCheckboxFilterChange(col.key, $event.target.checked)
-                  "
+              <!-- If checkbox type, show Bằng operator and Có/Không select dropdown -->
+              <template v-if="col.type === 'checkbox'">
+                <MsSelect
+                  v-model="filterStore.columnFilters[col.key].operator"
+                  :options="[{ value: 'equals', label: 'Bằng' }]"
+                  class="disabled-select"
                 />
-                <span>{{ col.label }}</span>
-              </label>
+                <MsSelect
+                  v-model="filterStore.columnFilters[col.key].value"
+                  :options="[
+                    { value: '1', label: 'Có' },
+                    { value: '0', label: 'Không' },
+                  ]"
+                  placeholder="Chọn giá trị"
+                />
+              </template>
+              <!-- For other types, show operator select and input -->
+              <template v-else>
+                <MsSelect
+                  v-model="filterStore.columnFilters[col.key].operator"
+                  :options="getOperatorOptions(col.type)"
+                />
+                <MsCurrencyInput
+                  v-if="col.key === 'costPrice' || col.key === 'salePrice'"
+                  v-model="filterStore.columnFilters[col.key].value"
+                  placeholder="Giá trị"
+                />
+                <MsInput
+                  v-else
+                  v-model="filterStore.columnFilters[col.key].value"
+                  placeholder="Giá trị"
+                />
+              </template>
             </div>
           </div>
         </div>
@@ -83,6 +91,7 @@ import { ref, computed, onMounted } from "vue";
 import MsInput from "../../../components/common/ms-input/MsInput.vue";
 import MsSelect from "../../../components/common/ms-select/MsSelect.vue";
 import MsButton from "../../../components/common/ms-button/MsButton.vue";
+import MsCurrencyInput from "../../../components/common/ms-currency-input/MsCurrencyInput.vue";
 import fieldMenuData from "../../../assets/data/fieldMenu.js";
 import { useFilterStore } from "../../../stores/filterStore";
 
@@ -94,6 +103,9 @@ const searchText = ref("");
 // Helper to get operators dynamically based on field type
 const getOperatorOptions = (type) => {
   const t = type?.toLowerCase();
+  if (t === "checkbox") {
+    return [{ value: "equals", label: "Bằng" }];
+  }
   if (t === "number" || t === "currency") {
     return [
       { value: "equals", label: "Bằng" },
@@ -116,12 +128,6 @@ const filteredColumns = computed(() => {
     c.label.toLowerCase().includes(searchText.value.toLowerCase()),
   );
 });
-
-const onCheckboxFilterChange = (key, checked) => {
-  filterStore.columnFilters[key].active = checked;
-  filterStore.columnFilters[key].value = checked ? "1" : "0";
-  filterStore.columnFilters[key].operator = "equals";
-};
 
 const close = () => {
   filterStore.showAdvancedFilter = false;
@@ -226,8 +232,15 @@ const clearAll = () => {
   }
 }
 :deep(.ms-input),
+:deep(.ms-currency-input),
 :deep(.ms-select) {
   width: 200px !important;
+}
+
+:deep(.disabled-select) {
+  pointer-events: none !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
 }
 
 :deep(.ms-input--search .ms-input__field) {
@@ -243,7 +256,7 @@ const clearAll = () => {
   gap: 8px;
 }
 .filter__footer {
-  height: 56px;
+  height: 48px;
   padding: 0 16px;
   border-top: 1px solid #e0e0e0;
   background: #fafafa;

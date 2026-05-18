@@ -136,3 +136,9 @@
   padding: 0 !important;
   white-space: nowrap !important;
 }
+
+.disabled-select {
+  pointer-events: none !important;
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}

@@ -17,12 +17,15 @@ const mainFormRef = ref(null);
 const isEdit = computed(() => !!route.params.id);
 
 const handleBack = async () => {
-  const confirmed = await confirmDialog("Bạn đang thêm/sửa, bạn có chắc chắn muốn quay lại khi chưa lưu không?", {
-    title: "Xác nhận",
-    type: "warning",
-    confirmText: "Có",
-    cancelText: "Không",
-  });
+  const confirmed = await confirmDialog(
+    "Bạn đang thêm/sửa, bạn có chắc chắn muốn quay lại khi chưa lưu không?",
+    {
+      title: "Xác nhận",
+      type: "warning",
+      confirmText: "Có",
+      cancelText: "Không",
+    },
+  );
   if (confirmed) {
     router.push({ name: "inventory" });
   }
@@ -32,15 +35,12 @@ const handleSave = async () => {
   if (mainFormRef.value) {
     const isValid = mainFormRef.value.validateAll();
     if (!isValid) {
-      toast.error("Vui lòng kiểm tra lại thông tin");
       return;
     }
     const success = await mainFormRef.value.saveData();
     if (success) {
       toast.success("Lưu dữ liệu thành công");
       router.push({ name: "inventory" });
-    } else {
-      toast.error("Lưu dữ liệu thất bại");
     }
   }
 };

@@ -11,15 +11,39 @@
       />
     </div>
     <div class="popup-body">
-      <MsSelect
-        v-model="filter.operator"
-        :options="operatorOptions"
-      />
-      <MsInput
-        v-model="filter.value"
-        placeholder="Giá trị lọc"
-        @keyup.enter="$emit('apply')"
-      />
+      <template v-if="columnType === 'checkbox'">
+        <MsSelect
+          v-model="filter.operator"
+          :options="[{ value: 'equals', label: 'Bằng' }]"
+          class="disabled-select"
+        />
+        <MsSelect
+          v-model="filter.value"
+          :options="[
+            { value: '1', label: 'Có' },
+            { value: '0', label: 'Không' }
+          ]"
+          placeholder="Chọn giá trị"
+        />
+      </template>
+      <template v-else>
+        <MsSelect
+          v-model="filter.operator"
+          :options="operatorOptions"
+        />
+        <MsCurrencyInput
+          v-if="columnName === 'Giá vốn' || columnName === 'Giá bán'"
+          v-model="filter.value"
+          placeholder="Giá trị lọc"
+          @keyup.enter="$emit('apply')"
+        />
+        <MsInput
+          v-else
+          v-model="filter.value"
+          placeholder="Giá trị lọc"
+          @keyup.enter="$emit('apply')"
+        />
+      </template>
     </div>
     <div class="popup-footer">
       <MsButton type="secondary" class="btn-action" @click="$emit('clear')">Bỏ lọc</MsButton>
@@ -37,6 +61,7 @@ import MsIcon from "../ms-icon/MsIcon.vue";
 import MsSelect from "../ms-select/MsSelect.vue";
 import MsInput from "../ms-input/MsInput.vue";
 import MsButton from "../ms-button/MsButton.vue";
+import MsCurrencyInput from "../ms-currency-input/MsCurrencyInput.vue";
 
 const icons = inject("icons");
 
@@ -63,6 +88,11 @@ const emit = defineEmits(["apply", "clear", "close"]);
 
 const operatorOptions = computed(() => {
   const type = props.columnType?.toLowerCase();
+  if (type === "checkbox") {
+    return [
+      { value: "equals", label: "Bằng" }
+    ];
+  }
   if (type === "number" || type === "currency") {
     return [
       { value: "equals", label: "Bằng" },

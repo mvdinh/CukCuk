@@ -35,6 +35,17 @@ import { useTypeStore } from "../../../stores/typeStore";
 import { useServingStore } from "../../../stores/servingStore";
 import { useRoute } from "vue-router";
 import { toast } from "../../../utils/toast";
+import axios from "axios";
+
+async function sha1(string) {
+  const utf8 = new TextEncoder().encode(string);
+  const hashBuffer = await crypto.subtle.digest("SHA-1", utf8);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hashHex;
+}
 
 export default defineComponent({
   name: "InventoryDetailMain",
@@ -97,6 +108,7 @@ export default defineComponent({
     const isCategoryDialogOpen = ref(false);
     const isUnitDialogOpen = ref(false);
     const showAllErrors = ref(false);
+    const selectedFile = ref(null);
 
     watch(
       () => item.value.itemName,
@@ -240,25 +252,113 @@ export default defineComponent({
 
     const saveData = async () => {
       try {
+        // If there is an image chosen locally, upload it to Cloudinary first
+        if (selectedFile.value) {
+          toast.info("Đang tải ảnh lên Cloudinary...");
+
+          const cloudName = import.meta.env.VITE_CLOUDINARY_NAME?.replace(
+            /['"]/g,
+            "",
+          );
+          const apiKey = import.meta.env.VITE_CLOUDINARY_KEY?.replace(
+            /['"]/g,
+            "",
+          );
+          const apiSecret = import.meta.env.VITE_CLOUDINARY_SECRET?.replace(
+            /['"]/g,
+            "",
+          );
+          const timestamp = Math.round(new Date().getTime() / 1000);
+
+          const stringToSign = `timestamp=${timestamp}${apiSecret}`;
+          const signature = await sha1(stringToSign);
+
+          const formData = new FormData();
+          formData.append("file", selectedFile.value);
+          formData.append("api_key", apiKey);
+          formData.append("timestamp", timestamp);
+          formData.append("signature", signature);
+
+          const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+          const response = await axios.post(uploadUrl, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+
+          if (response.data && response.data.secure_url) {
+            item.value.ImgUrl = response.data.secure_url;
+            toast.success("Tải ảnh lên Cloudinary thành công!");
+            selectedFile.value = null; // Clear chosen file after successful upload
+          } else {
+            toast.error("Tải ảnh lên Cloudinary thất bại.");
+            return false;
+          }
+        }
+
         await inventoryItemStore.saveItem(item.value, isEdit.value);
         return true;
       } catch (err) {
+        console.error("Cloudinary upload or save error:", err);
+        
+        if (err.response && err.response.data) {
+          const resData = err.response.data;
+          let validationErrors = {};
+
+          // 1. Try to get from moreInfo
+          if (resData.moreInfo && typeof resData.moreInfo === "object") {
+            validationErrors = { ...resData.moreInfo };
+          } 
+          // 2. Try to get from devMsg if it is a JSON string
+          else if (resData.devMsg && typeof resData.devMsg === "string" && resData.devMsg.trim().startsWith("{")) {
+            try {
+              validationErrors = JSON.parse(resData.devMsg);
+            } catch (parseErr) {
+              console.error("Failed to parse devMsg JSON:", parseErr);
+            }
+          }
+
+          // Apply errors directly to frontend validation state
+          if (Object.keys(validationErrors).length > 0) {
+            Object.keys(validationErrors).forEach(key => {
+              // Convert PascalCase key from backend (e.g. ItemCode) to camelCase for frontend (e.g. itemCode)
+              const camelKey = key.charAt(0).toLowerCase() + key.slice(1);
+              if (camelKey in errors.value) {
+                errors.value[camelKey] = validationErrors[key];
+              }
+            });
+            showAllErrors.value = true; // Instantly trigger display of error borders & tooltips
+          } else {
+            toast.error(resData.userMsg || "Dữ liệu không hợp lệ.");
+          }
+        } else {
+          toast.error("Có lỗi xảy ra khi lưu dữ liệu.");
+        }
+        
         return false;
       }
+    };
+
+    const clearImage = () => {
+      item.value.ImgUrl = null;
+      selectedFile.value = null; // Clear chosen file
     };
 
     const handleFileUpload = (event) => {
       const file = event.target.files[0];
       if (!file) return;
       if (file.size > 5 * 1024 * 1024) {
-        alert("Vui lòng chọn ảnh dung lượng dưới 5MB");
+        toast.warning("Vui lòng chọn ảnh dung lượng dưới 5MB");
         return;
       }
+
+      selectedFile.value = file;
       try {
-        // Fake upload locally, directly use URL.createObjectURL
+        // Show immediate local preview in browser
         item.value.ImgUrl = URL.createObjectURL(file);
       } catch (err) {
-        alert("Tải ảnh thất bại");
+        console.error("Local preview failed:", err);
+        toast.error("Không thể hiển thị ảnh xem trước.");
       }
       event.target.value = "";
     };
@@ -311,6 +411,7 @@ export default defineComponent({
       handleAddServingRow,
       showAllErrors,
       handleFileUpload,
+      clearImage,
       saveData,
     };
 
